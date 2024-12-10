@@ -1,3 +1,7 @@
+# Our
+.env.local
+venv
+
 # Logs
 logs
 *.log
