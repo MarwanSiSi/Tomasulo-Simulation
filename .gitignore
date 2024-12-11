@@ -1,6 +1,7 @@
 # Our
 .env.local
 venv
+__pycache__
 
 # Logs
 logs
