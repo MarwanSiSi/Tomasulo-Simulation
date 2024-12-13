@@ -49,9 +49,14 @@ function App() {
     setPinnedRegisters,
     setRegisterFile,
     cache,
-  } = useFunctions();
+  } = useFunctions({
+    setFloatAddSubStations,
+    setFloatMulDivStations,
+    setIntAddSubStations,
 
-  console.log(intAddSubStations);
+    setLoadStations,
+    setStoreStations,
+  });
 
   // things to be sent on mount : addSubLatency, mulDivLatency, intAddSubLatency, loadBufferSize, storeBufferSize, floatAddSubStationSize, floatMulDivStationSize, intAddSubStationSize, cacheHitLatency, cacheMissLatency, cacheSize, blockSize
   useEffect(() => {

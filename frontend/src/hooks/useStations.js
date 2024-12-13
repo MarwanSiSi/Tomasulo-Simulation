@@ -4,23 +4,23 @@ import { createStations } from "../utils/helpers.js";
 export const useStations = (config) => {
   // Initialize all stations based on config
   const [floatAddSubStations, setFloatAddSubStations] = useState(() =>
-    createStations("AF", config.floatAddSubStationSize)
+    createStations("AF", config.floatAddSubStationSize),
   );
 
   const [floatMulDivStations, setFloatMulDivStations] = useState(() =>
-    createStations("MF", config.floatMulDivStationSize)
+    createStations("MF", config.floatMulDivStationSize),
   );
 
   const [intAddSubStations, setIntAddSubStations] = useState(() =>
-    createStations("AI", config.intAddSubStationSize)
+    createStations("AI", config.intAddSubStationSize),
   );
 
   const [loadStations, setLoadStations] = useState(() =>
-    createStations("L", config.loadBufferSize)
+    createStations("L", config.loadBufferSize),
   );
 
   const [storeStations, setStoreStations] = useState(() =>
-    createStations("S", config.storeBufferSize)
+    createStations("S", config.storeBufferSize),
   );
 
   // Helper function to reset all stations

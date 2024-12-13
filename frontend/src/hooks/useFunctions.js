@@ -1,25 +1,19 @@
 import { useState } from "react";
 import axios from "axios";
-import { useStations } from "./useStations";
-import { useConfig } from "./useConfig";
 
-export const useFunctions = () => {
+export const useFunctions = ({
+  setFloatAddSubStations,
+  setFloatMulDivStations,
+  setIntAddSubStations,
+
+  setLoadStations,
+  setStoreStations,
+}) => {
   const [instructions, setInstructions] = useState([]);
   const [hasLoop, setHasLoop] = useState(false);
   const [cycle, setCycle] = useState(0);
   const [instructionQueue, setInstructionQueue] = useState([]);
   const [cache, setCache] = useState([]);
-
-  const { config } = useConfig();
-
-  const {
-    setFloatAddSubStations,
-    setFloatMulDivStations,
-    setIntAddSubStations,
-
-    setLoadStations,
-    setStoreStations,
-  } = useStations(config);
 
   const [registerFile, setRegisterFile] = useState({
     ...Array(32)
@@ -29,7 +23,7 @@ export const useFunctions = () => {
           ...acc,
           [`R${idx}`]: { value: 0, busy: false, station: null },
         }),
-        {}
+        {},
       ),
     ...Array(32)
       .fill()
@@ -38,10 +32,9 @@ export const useFunctions = () => {
           ...acc,
           [`F${idx}`]: { value: 0, busy: false, station: null },
         }),
-        {}
+        {},
       ),
   });
-  console.log("registerFile", registerFile);
   const [pinnedRegisters, setPinnedRegisters] = useState(new Set());
 
   const handleFileUpload = (event) => {
@@ -68,7 +61,6 @@ export const useFunctions = () => {
   const handleRegFileUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
-    console.log("event", event);
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
@@ -92,7 +84,7 @@ export const useFunctions = () => {
       } catch (error) {
         console.error("Error parsing register file:", error);
         alert(
-          "Invalid register file format. Expected format: R0=1,R1=2,F0=3.14,F1=2.5"
+          "Invalid register file format. Expected format: R0=1,R1=2,F0=3.14,F1=2.5",
         );
       }
     };
@@ -101,17 +93,10 @@ export const useFunctions = () => {
 
   const nextCycle = async () => {
     const res = await axios.get(`http://localhost:8080/cycle`);
-    console.log("res", res.data);
 
     const { data } = res;
 
     const { cache, cycle, instruction_queue, registers, stations } = data;
-
-    // console.log("cache", cache);
-    // console.log("cycle", cycle);
-    // console.log("instruction_queue", instruction_queue);
-    // console.log("registers", registers);
-    // console.log("stations", stations);
 
     setInstructionQueue(instruction_queue);
 
@@ -146,7 +131,7 @@ export const useFunctions = () => {
             ...acc,
             [`R${idx}`]: { value: 0, busy: false, station: null },
           }),
-          {}
+          {},
         ),
       ...Array(32)
         .fill()
@@ -155,7 +140,7 @@ export const useFunctions = () => {
             ...acc,
             [`F${idx}`]: { value: 0, busy: false, station: null },
           }),
-          {}
+          {},
         ),
     });
   };

@@ -1,7 +1,6 @@
 import PropTypes from "prop-types";
 
 export default function ExecTable({ data }) {
-  console.log(data);
   return (
     <div className="w-3/4 ">
       <table className="w-full border-collapse">
