@@ -1,14 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
 
-export const useFunctions = ({
-  setFloatAddSubStations,
-  setFloatMulDivStations,
-  setIntAddSubStations,
-
-  setLoadStations,
-  setStoreStations,
-}) => {
+export const useFunctions = () => {
   const [instructions, setInstructions] = useState([]);
   const [hasLoop, setHasLoop] = useState(false);
   const [cycle, setCycle] = useState(0);
@@ -91,34 +83,6 @@ export const useFunctions = ({
     reader.readAsText(file);
   };
 
-  const nextCycle = async () => {
-    const res = await axios.get(`http://localhost:8080/cycle`);
-
-    const { data } = res;
-
-    const { cache, instruction_queue, registers, stations } = data;
-
-    console.log(instruction_queue);
-    setInstructionQueue(instruction_queue);
-
-    setRegisterFile(registers);
-
-    setFloatAddSubStations(stations.AF);
-
-    setFloatMulDivStations(stations.M);
-
-    setIntAddSubStations(stations.AI);
-
-    setLoadStations(stations.L);
-
-    setStoreStations(stations.S);
-
-    setCycle((prev) => prev + 1);
-
-    console.log(cache);
-    setCache(cache);
-  };
-
   const handleReset = (resetAllStations) => {
     setCycle(1);
     setHasLoop(false);
@@ -155,12 +119,13 @@ export const useFunctions = ({
     pinnedRegisters,
     handleFileUpload,
     handleRegFileUpload,
-    nextCycle,
     handleReset,
     setPinnedRegisters,
     setRegisterFile,
     instructionQueue,
     setInstructionQueue,
     cache,
+    setCycle,
+    setCache,
   };
 };

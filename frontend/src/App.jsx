@@ -7,6 +7,7 @@ import { useStations } from "./hooks/useStations";
 import { useConfig } from "./hooks/useConfig";
 import { useFunctions } from "./hooks/useFunctions";
 import InstructionQueue from "./components/InstQueue";
+import axios from "axios";
 
 function App() {
   const { config, setConfig } = useConfig();
@@ -38,24 +39,48 @@ function App() {
     pinnedRegisters,
     handleFileUpload,
     handleRegFileUpload,
-    nextCycle,
     handleReset,
     setPinnedRegisters,
 
     instructionQueue,
+    setInstructionQueue,
+    setRegisterFile,
 
     cache,
-  } = useFunctions({
-    setFloatAddSubStations,
-    setFloatMulDivStations,
-    setIntAddSubStations,
-
-    setLoadStations,
-    setStoreStations,
-  });
+    setCache,
+    setCycle,
+  } = useFunctions();
 
   console.log(cache);
   console.log(instructionQueue);
+
+  const nextCycle = async () => {
+    const res = await axios.get(`http://localhost:8080/cycle`);
+
+    const { data } = res;
+
+    const { cache, instruction_queue, registers, stations } = data;
+
+    console.log(instruction_queue);
+    setInstructionQueue(instruction_queue);
+
+    setRegisterFile(registers);
+
+    setFloatAddSubStations(stations.AF);
+
+    setFloatMulDivStations(stations.M);
+
+    setIntAddSubStations(stations.AI);
+
+    setLoadStations(stations.L);
+
+    setStoreStations(stations.S);
+
+    setCycle((prev) => prev + 1);
+
+    console.log(cache);
+    setCache(cache);
+  };
 
   return (
     <div className="p-6 max-w-full mx-auto">
