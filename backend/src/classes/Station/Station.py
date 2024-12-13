@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 
-from src.classes.Simulator import Simulator
 from src.utils import execute_station_entry
 
 from .StationEntry import StationEntry
@@ -8,20 +7,20 @@ from src.enums.StationState import StationState
 
 
 class Station(ABC):
-    def __init__(self, name: str, size: int, latency: int, prefex: str):
+    def __init__(self, simulator, name: str, size: int, latency: int, prefex: str):
         self.name = name
         self.size = size  # Number of slots in the station
         self.latency = latency
         self.entries: list[StationEntry] = [
-            StationEntry(f"{prefex}{i + 1}", 0) for i in range(size)
+            StationEntry(f"{prefex}{i + 1}", latency) for i in range(size)
         ]
-        self.simulator = Simulator.get_instance()
+        self.simulator = simulator
 
     def __str__(self):
-        return f"{self.name} (Size: {self.size})"
+        return f"{self.name}: {self.entries}"
 
     def __repr__(self):
-        return f"{self.name} (Size: {self.size})"
+        return str(self)
 
     @abstractmethod
     def update(self, time: int):
@@ -45,10 +44,10 @@ class Station(ABC):
             station_entry.qk = entry.qk
             station_entry.a = entry.a
             station_entry.cycles_remaining = self.latency
-            station_entry.state = StationState.WAITING
+            station_entry.state = StationState.ISSUED
             station_entry.start_cycle = time
 
-            return entry.tag
+            return station_entry.tag
 
         return None
 
@@ -84,21 +83,18 @@ class AddStation(Station):
 
                 continue
 
+            if entry.state == StationState.ISSUED:
+                entry.state = StationState.WAITING
+                return
+
             if entry.cycles_remaining > 0:  # Decrement cycles
                 entry.cycles_remaining -= 1
                 entry.state = StationState.EXECUTING
-                print(
-                    f"{self.name}: ADD/SUB in progress at slot {index}, "
-                    f"cycles remaining = {entry.cycles_remaining}."
-                )
             else:  # Execute if all cycles are completed
                 try:
                     result = execute_station_entry(entry)
                     entry.result = result
                     entry.state = StationState.WRITING
-                    print(
-                        f"{self.name}: Executed ADD/SUB at slot {index}, result = {result}."
-                    )
                 except Exception as e:
                     print(f"{self.name}: Error at slot {index}: {e}")
 
@@ -127,21 +123,18 @@ class MulStation(Station):
 
                 continue
 
+            if entry.state == StationState.ISSUED:
+                entry.state = StationState.WAITING
+                return
+
             if entry.cycles_remaining > 0:  # Decrement cycles
                 entry.cycles_remaining -= 1
                 entry.state = StationState.EXECUTING
-                print(
-                    f"{self.name}: MUL/DIV in progress at slot {index}, "
-                    f"cycles remaining = {entry.cycles_remaining}."
-                )
             else:  # Execute if all cycles are completed
                 try:
                     result = execute_station_entry(entry)
                     entry.result = result
                     entry.state = StationState.WRITING
-                    print(
-                        f"{self.name}: Executed MUL/DIV at slot {index}, result = {result}."
-                    )
                 except ZeroDivisionError as e:
                     print(f"{self.name}: Division by zero at slot {index}: {e}")
                 except Exception as e:
@@ -168,6 +161,10 @@ class LoadStation(Station):
                     entry.qj = None
 
                 continue
+
+            if entry.state == StationState.ISSUED:
+                entry.state = StationState.WAITING
+                return
 
             mem_request = self.simulator.memory_manager.requests.get(entry.tag, None)
             if mem_request is not None and mem_request.result is not None:
@@ -202,6 +199,10 @@ class StoreStation(Station):
                     entry.qk = None
 
                 continue
+
+            if entry.state == StationState.ISSUED:
+                entry.state = StationState.WAITING
+                return
 
             mem_request = self.simulator.memory_manager.requests.get(entry.tag, None)
             if mem_request is not None and mem_request.done:

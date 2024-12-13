@@ -16,6 +16,12 @@ class StationEntry:
         self.start_cycle: int = 0
         self.cycles_remaining: int = cycles_required
 
+    def __str__(self) -> str:
+        return f"{self.tag}: {self.state} {self.op} {self.vj} {self.vk} {self.qj} {self.qk} {self.a} {self.result} {self.start_cycle} {self.cycles_remaining}"
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
     def reset(self) -> None:
         self.busy = False
         self.state = StationState.READY

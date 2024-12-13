@@ -13,7 +13,7 @@ class Instruction:
     ):
         self.instr_type = instr_type  # R-type, I-type, or J-type
         self.opcode = opcode  # Opcode from the Opcode enum
-        self.immediate = immediate  # Memory immediate (for load/store or label)
+        self.immediate = int(immediate) if immediate is not None else None # Memory immediate (for load/store or label)
         self.src = src  # Source register (Registers enum)
         self.target = target  # Target register (Registers enum)
         self.dest = dest  # Destination register (Registers enum)
@@ -101,7 +101,8 @@ class Instruction:
 
         elif opcode in {Opcode.DADDI, Opcode.DSUBI}:
             instr_type = InstructionType.I_TYPE
-            dest, src, immediate = operands
+            dest, src = map(Instruction.parse_register, operands[0:2])
+            immediate = operands[2]
             return Instruction(
                 instr_type, opcode, src=src, dest=dest, immediate=immediate
             )

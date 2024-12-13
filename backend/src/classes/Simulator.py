@@ -11,37 +11,30 @@ from .Station.StationEntry import StationEntry
 
 
 class Simulator:
-    __loaded = False
-    __instance = None
-
     def __init__(self) -> None:
-        if self.__instance is not None and not self.__loaded:
-            raise Exception("This class is a singleton!")
-
-        self.__instance = self
-        self.pc: int = 0
-        self.cycle: int = 0
+        self.pc: int = -1
+        self.cycle: int = -1
         self.program: list[Instruction] = []
-        self.memory_manager: MemoryManager = MemoryManager()
-        self.register_file: RegisterFile = RegisterFile()
-        self.reservation_stations: list[Station] = []
-        self.reservation_stations.append(AddStation("Add/Sub Int Station", 1, 1, "AI"))
-        self.reservation_stations.append(
-            AddStation("Add/Sub Float Station", 1, 1, "AF")
-        )
-        self.reservation_stations.append(MulStation("Mul/Div Float Station", 1, 1, "M"))
-        self.reservation_stations.append(LoadStation("Load Station", 1, 1, "L"))
-        self.reservation_stations.append(StoreStation("Store Station", 1, 1, "S"))
+        self.memory_manager: MemoryManager = MemoryManager(self)
+        self.register_file: RegisterFile = RegisterFile(self)
+        self.reservation_stations: list[Station] = [
+            AddStation(self, "Add/Sub Int Station", 1, 1, "AI"),
+            AddStation(self, "Add/Sub Float Station", 1, 1, "AF"),
+            MulStation(self, "Mul/Div Float Station", 1, 1, "MF"),
+            LoadStation(self, "Load Station", 1, 1, "L"),
+            StoreStation(self, "Store Station", 1, 1, "S"),
+        ]
         self.cdb = CDB()
         self.instruction_queue: deque[Instruction] = deque()
 
-    @staticmethod
-    def get_instance() -> "Simulator":
-        if Simulator.__instance is None:
-            Simulator.__loaded = True
-            Simulator.__instance = Simulator()
+    def __str__(self) -> str:
+        return f"PC: {self.pc}, Cycle: {self.cycle}"
 
-        return Simulator.__instance
+    def __repr__(self) -> str:
+        return str(self)
+
+    def load_program(self, file_path: str) -> None:
+        self.program = Instruction.parse_instructions_file(file_path)
 
     def update(self) -> None:
         self.cycle += 1
@@ -224,8 +217,8 @@ class Simulator:
                 station_entry, self.cycle
             )
             if result is not None:
-                assert instruction.dest is not None
-                self.register_file.update_register(instruction.dest, result)
+                assert instruction.target is not None
+                self.register_file.update_register(instruction.target, result)
 
         elif station_entry.op in {Opcode.SW, Opcode.SD, Opcode.S_S, Opcode.S_D}:
             result = self.reservation_stations[4].assign_entry(
@@ -246,6 +239,9 @@ class Simulator:
                     finished.append(entry)
 
         finished.sort(key=lambda x: x.start_cycle)
+
+        if len(finished) == 0:
+            return
 
         self.cdb.write(finished[0].tag, finished[0].result)
         finished[0].busy = False

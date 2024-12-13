@@ -1,13 +1,12 @@
 from src.enums import Registers
 
 from .Register import Register
-from .Simulator import Simulator
 
 
 class RegisterFile:
     """Class representing a collection of registers using a hashmap."""
 
-    def __init__(self):
+    def __init__(self, simulator) -> None:
         """
         Initialize a hashmap (dictionary) to store registers by their names.
         Each register is represented by its name, value, and optional station tag (Q).
@@ -15,7 +14,18 @@ class RegisterFile:
         self.registers: dict[str, Register] = {
             e.value: Register(name=e) for e in Registers
         }
-        self.simulator = Simulator.get_instance()
+        self.simulator = simulator
+
+    def __str__(self) -> str:
+        """
+        Return a string representation of the register file.
+        """
+        return "\n".join(
+            [f"{name}: {register.get()}" for name, register in self.registers.items()]
+        )
+
+    def __repr__(self) -> str:
+        return self.__str__()
 
     def get_register(self, name: Registers) -> int | float | str:
         """

@@ -1,9 +1,19 @@
+from collections import OrderedDict
+
 from src.exceptions import MemoryAccessException
 
 
 class Cache:
     def __init__(self):
-        self.__cache: dict[int, int | float] = {}
+        self.__cache = OrderedDict()
+
+    def __str__(self) -> str:
+        return "\n".join(
+            [f"{address}: {value}" for address, value in self.__cache.items()]
+        )
+
+    def __repr__(self) -> str:
+        return self.__str__()
 
     def contains(self, address: int) -> bool:
         return address in self.__cache

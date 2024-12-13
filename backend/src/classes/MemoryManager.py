@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from src.exceptions import MemoryAccessException
 
 from .Cache import Cache
-from .Simulator import Simulator
 
 
 class MemoryManager:
@@ -18,14 +17,16 @@ class MemoryManager:
         result: int | float | None = None
         done: bool = False
 
-    def __init__(self, latency: int = 1, penalty: int = 5, block_size: int = 1024):
+    def __init__(
+        self, simulator, latency: int = 1, penalty: int = 5, block_size: int = 1024
+    ):
         self.latency = latency
         self.penalty = penalty
         self.block_size = block_size
         self.cache = Cache()
         self.data_memory: dict[int, int | float] = {}
         self.requests: dict[str, MemoryManager.Request] = {}
-        self.simulatior = Simulator.get_instance()
+        self.simulator = simulator
 
     def update(self):
         for tag, request in self.requests.copy().items():
