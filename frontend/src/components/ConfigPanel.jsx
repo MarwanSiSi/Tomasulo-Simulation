@@ -59,19 +59,6 @@ const ConfigPanel = ({ config, setConfig }) => {
                 className="w-full p-2 border rounded"
               />
             </div>
-            <div>
-              <label className="block text-base font-medium mb-1">
-                Int Mul/Div Latency
-              </label>
-              <input
-                type="number"
-                name="intMulDivLatency"
-                value={config.intMulDivLatency}
-                onChange={handleChange}
-                min="1"
-                className="w-full p-2 border rounded"
-              />
-            </div>
           </div>
         </div>
 
@@ -141,19 +128,6 @@ const ConfigPanel = ({ config, setConfig }) => {
                 type="number"
                 name="intAddSubStationSize"
                 value={config.intAddSubStationSize}
-                onChange={handleChange}
-                min="1"
-                className="w-full p-2 border rounded"
-              />
-            </div>
-            <div>
-              <label className="block text-base font-medium mb-1">
-                Int Mul/Div Station Size
-              </label>
-              <input
-                type="number"
-                name="intMulDivStationSize"
-                value={config.intMulDivStationSize}
                 onChange={handleChange}
                 min="1"
                 className="w-full p-2 border rounded"
@@ -233,7 +207,6 @@ ConfigPanel.propTypes = {
     floatAddSubLatency: PropTypes.number.isRequired,
     floatMulDivLatency: PropTypes.number.isRequired,
     intAddSubLatency: PropTypes.number.isRequired,
-    intMulDivLatency: PropTypes.number.isRequired,
 
     // Station size configuration
     loadBufferSize: PropTypes.number.isRequired,
@@ -241,7 +214,6 @@ ConfigPanel.propTypes = {
     floatAddSubStationSize: PropTypes.number.isRequired,
     floatMulDivStationSize: PropTypes.number.isRequired,
     intAddSubStationSize: PropTypes.number.isRequired,
-    intMulDivStationSize: PropTypes.number.isRequired,
 
     // Cache configuration
     cacheHitLatency: PropTypes.number.isRequired,

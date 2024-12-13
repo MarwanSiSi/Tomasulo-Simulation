@@ -1,9 +1,10 @@
 import { useState } from "react";
+import axios from "axios";
 
 export const useFunctions = () => {
   const [instructions, setInstructions] = useState([]);
   const [hasLoop, setHasLoop] = useState(false);
-  const [cycle, setCycle] = useState(1);
+  const [cycle, setCycle] = useState(0);
   const [registerFile, setRegisterFile] = useState({
     ...Array(32)
       .fill()
@@ -24,6 +25,7 @@ export const useFunctions = () => {
         {}
       ),
   });
+  console.log("registerFile", registerFile);
   const [pinnedRegisters, setPinnedRegisters] = useState(new Set());
 
   const handleFileUpload = (event) => {

@@ -6,7 +6,6 @@ export function useConfig() {
     floatAddSubLatency: 1,
     floatMulDivLatency: 1,
     intAddSubLatency: 1,
-    intMulDivLatency: 1,
 
     // Load/store latencies
     cacheHitLatency: 1,
@@ -20,7 +19,6 @@ export function useConfig() {
     storeBufferSize: 1,
 
     intAddSubStationSize: 1,
-    intMulDivStationSize: 1,
 
     // Cache
     cacheSize: 1024,

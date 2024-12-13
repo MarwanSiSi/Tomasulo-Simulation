@@ -7,6 +7,9 @@ import { useStations } from "./hooks/useStations";
 import { useConfig } from "./hooks/useConfig";
 import { useFunctions } from "./hooks/useFunctions";
 import InstructionQueue from "./components/InstQueue";
+import ExecTable from "./components/ExecTable";
+import { useEffect } from "react";
+import axios from "axios";
 
 function App() {
   const { config, setConfig } = useConfig();
@@ -19,7 +22,6 @@ function App() {
     storeStations,
 
     intAddSubStations,
-    intMulDivStations,
 
     resetAllStations,
   } = useStations(config);
@@ -36,6 +38,9 @@ function App() {
     handleReset,
     setPinnedRegisters,
   } = useFunctions();
+
+  // things to be sent on mount : addSubLatency, mulDivLatency, intAddSubLatency, loadBufferSize, storeBufferSize, floatAddSubStationSize, floatMulDivStationSize, intAddSubStationSize, cacheHitLatency, cacheMissLatency, cacheSize, blockSize
+  useEffect(() => {}, []);
 
   return (
     <div className="p-6 max-w-full mx-auto">
@@ -104,13 +109,6 @@ function App() {
                 type="arithmetic"
                 tableSize={config.intAddSubStationSize}
               />
-
-              <ReservationStationTable
-                title="Int Multiply/Divide Reservation Stations"
-                stations={Object.entries(intMulDivStations)}
-                type="arithmetic"
-                tableSize={config.intMulDivStationSize}
-              />
             </div>
             <div className="w-1/4">
               <div className="mt-10">
@@ -128,14 +126,80 @@ function App() {
           </div>
         </div>
       </div>
-      <div className="mt-8 w-full">
+      <div className="mt-8 w-full flex justify-between gap-7">
+        <ExecTable
+          data={[
+            {
+              OP: "ADD",
+              Dest: "R2",
+              j: "R3",
+              k: "R4",
+              issue: 5,
+              execComp: 6,
+              writeResult: 7,
+            },
+            {
+              OP: "LD",
+              Dest: "F0",
+              j: null,
+              k: "R1",
+              issue: 5,
+              execComp: 6,
+              writeResult: 7,
+            },
+            {
+              OP: "SD",
+              Dest: null,
+              j: "F0",
+              k: "R1",
+              issue: 5,
+              execComp: 6,
+              writeResult: 7,
+            },
+            {
+              OP: "SD",
+              Dest: null,
+              j: "F0",
+              k: "R1",
+              issue: 5,
+              execComp: 6,
+              writeResult: 7,
+            },
+            {
+              OP: "SD",
+              Dest: null,
+              j: "F0",
+              k: "R1",
+              issue: 5,
+              execComp: 6,
+              writeResult: 7,
+            },
+            {
+              OP: "SD",
+              Dest: null,
+              j: "F0",
+              k: "R1",
+              issue: 5,
+              execComp: 6,
+              writeResult: 7,
+            },
+          ]}
+        />
         <div className="justify-end flex">
           <InstructionQueue
             instructions={[
-              "Initialize system",
-              "Load configuration",
-              "Start processing",
-              "Validate data",
+              "DADDI R1, R1, 24",
+              "DADDI R2, R2, 0",
+              "DADDI R1, R1, 24",
+              "DADDI R2, R2, 0",
+              "DADDI R1, R1, 24",
+              "DADDI R2, R2, 0",
+              "DADDI R1, R1, 24",
+              "DADDI R2, R2, 0",
+              "DADDI R1, R1, 24",
+              "DADDI R2, R2, 0",
+              "DADDI R1, R1, 24",
+              "DADDI R2, R2, 0",
             ]}
           />
         </div>

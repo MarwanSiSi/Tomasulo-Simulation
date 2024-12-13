@@ -1,92 +1,38 @@
 import { useState } from "react";
-import {
-  createEmptyArithmeticStation,
-  createEmptyLoadStation,
-  createEmptyStoreStation,
-  createStations,
-} from "../utils/helpers.js";
+import { createStations } from "../utils/helpers.js";
 
 export const useStations = (config) => {
   // Initialize all stations based on config
   const [floatAddSubStations, setFloatAddSubStations] = useState(() =>
-    createStations(
-      "AF",
-      config.floatAddSubStationSize,
-      createEmptyArithmeticStation
-    )
+    createStations("AF", config.floatAddSubStationSize)
   );
 
   const [floatMulDivStations, setFloatMulDivStations] = useState(() =>
-    createStations(
-      "MF",
-      config.floatMulDivStationSize,
-      createEmptyArithmeticStation
-    )
+    createStations("MF", config.floatMulDivStationSize)
   );
 
   const [intAddSubStations, setIntAddSubStations] = useState(() =>
-    createStations(
-      "AI",
-      config.intAddSubStationSize,
-      createEmptyArithmeticStation
-    )
-  );
-
-  const [intMulDivStations, setIntMulDivStations] = useState(() =>
-    createStations(
-      "MI",
-      config.intMulDivStationSize,
-      createEmptyArithmeticStation
-    )
+    createStations("AI", config.intAddSubStationSize)
   );
 
   const [loadStations, setLoadStations] = useState(() =>
-    createStations("L", config.loadBufferSize, createEmptyLoadStation)
+    createStations("L", config.loadBufferSize)
   );
 
   const [storeStations, setStoreStations] = useState(() =>
-    createStations("S", config.storeBufferSize, createEmptyStoreStation)
+    createStations("S", config.storeBufferSize)
   );
 
   // Helper function to reset all stations
   const resetAllStations = () => {
-    setFloatAddSubStations(
-      createStations(
-        "AF",
-        config.floatAddSubStationSize,
-        createEmptyArithmeticStation
-      )
-    );
-    setFloatMulDivStations(
-      createStations(
-        "MF",
-        config.floatMulDivStationSize,
-        createEmptyArithmeticStation
-      )
-    );
+    setFloatAddSubStations(createStations("AF", config.floatAddSubStationSize));
+    setFloatMulDivStations(createStations("MF", config.floatMulDivStationSize));
 
-    setIntAddSubStations(
-      createStations(
-        "AI",
-        config.intAddSubStationSize,
-        createEmptyArithmeticStation
-      )
-    );
-    setIntMulDivStations(
-      createStations(
-        "MI",
-        config.intMulDivStationSize,
-        createEmptyArithmeticStation
-      )
-    );
+    setIntAddSubStations(createStations("AI", config.intAddSubStationSize));
 
-    setLoadStations(
-      createStations("L", config.loadBufferSize, createEmptyLoadStation)
-    );
+    setLoadStations(createStations("L", config.loadBufferSize));
 
-    setStoreStations(
-      createStations("S", config.storeBufferSize, createEmptyStoreStation)
-    );
+    setStoreStations(createStations("S", config.storeBufferSize));
   };
 
   return {
@@ -95,7 +41,6 @@ export const useStations = (config) => {
     floatMulDivStations,
 
     intAddSubStations,
-    intMulDivStations,
 
     loadStations,
     storeStations,
@@ -104,7 +49,6 @@ export const useStations = (config) => {
     setFloatAddSubStations,
     setFloatMulDivStations,
     setIntAddSubStations,
-    setIntMulDivStations,
 
     setLoadStations,
     setStoreStations,

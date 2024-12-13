@@ -1,4 +1,4 @@
-import React from "react";
+import PropTypes from "prop-types";
 import { Upload } from "lucide-react";
 
 const InstructionsTable = ({ instructions, handleFileUpload, handleReset }) => {
@@ -47,6 +47,11 @@ const InstructionsTable = ({ instructions, handleFileUpload, handleReset }) => {
       </div>
     </div>
   );
+};
+InstructionsTable.propTypes = {
+  instructions: PropTypes.arrayOf(PropTypes.string).isRequired,
+  handleFileUpload: PropTypes.func.isRequired,
+  handleReset: PropTypes.func.isRequired,
 };
 
 export default InstructionsTable;
