@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 
-const Cache = ({ data = [] }) => {
+const Cache = ({ data = {} }) => {
   return (
     <>
       <h2 className="text-xl font-bold">Cache Contents</h2>
@@ -14,17 +14,19 @@ const Cache = ({ data = [] }) => {
               </tr>
             </thead>
             <tbody>
-              {data.length > 0 ? (
-                data.map((entry, index) => (
-                  <tr key={index} className="hover:bg-gray-50">
-                    <td className="px-4 py-2 border-b font-mono text-center">
-                      {entry.address}
-                    </td>
-                    <td className="px-4 py-2 border-b font-mono text-center">
-                      {entry.value}
-                    </td>
-                  </tr>
-                ))
+              {Object.keys(data).length > 0 ? (
+                Object.entries(data).map((entry, index) => {
+                  return (
+                    <tr key={index} className="hover:bg-gray-50">
+                      <td className="px-4 py-2 border-b font-mono text-center">
+                        {entry[0]}
+                      </td>
+                      <td className="px-4 py-2 border-b font-mono text-center">
+                        {entry[1]}
+                      </td>
+                    </tr>
+                  );
+                })
               ) : (
                 <tr>
                   <td
@@ -43,7 +45,7 @@ const Cache = ({ data = [] }) => {
   );
 };
 Cache.propTypes = {
-  data: PropTypes.array,
+  data: PropTypes.object,
 };
 
 export default Cache;

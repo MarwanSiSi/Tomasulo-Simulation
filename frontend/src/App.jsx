@@ -8,6 +8,7 @@ import { useConfig } from "./hooks/useConfig";
 import { useFunctions } from "./hooks/useFunctions";
 import InstructionQueue from "./components/InstQueue";
 import axios from "axios";
+import { useEffect } from "react";
 
 function App() {
   const { config, setConfig } = useConfig();
@@ -51,17 +52,15 @@ function App() {
     setCycle,
   } = useFunctions();
 
-  console.log(cache);
-  console.log(instructionQueue);
-
   const nextCycle = async () => {
     const res = await axios.get(`http://localhost:8080/cycle`);
 
     const { data } = res;
 
+    console.log(data);
+
     const { cache, instruction_queue, registers, stations } = data;
 
-    console.log(instruction_queue);
     setInstructionQueue(instruction_queue);
 
     setRegisterFile(registers);
@@ -76,11 +75,24 @@ function App() {
 
     setStoreStations(stations.S);
 
-    setCycle((prev) => prev + 1);
+    setCycle(data.cycle);
 
-    console.log(cache);
     setCache(cache);
   };
+
+  useEffect(() => {
+    async function fetchData() {
+      axios
+        .post("http://0.0.0.0:8080/config", config)
+        .then((response) => {
+          console.log("Config posted successfully:", response.data);
+        })
+        .catch((error) => {
+          console.error("Error posting config:", error);
+        });
+    }
+    fetchData();
+  }, []);
 
   return (
     <div className="p-6 max-w-full mx-auto">
@@ -149,6 +161,7 @@ function App() {
                 type="arithmetic"
                 tableSize={config.intAddSubStationSize}
               />
+              <InstructionQueue instructions={instructionQueue} />
             </div>
             <div className="w-1/4">
               <div className="mt-10">
@@ -164,11 +177,6 @@ function App() {
               </div>
             </div>
           </div>
-        </div>
-      </div>
-      <div className="mt-8 w-full flex justify-between gap-7">
-        <div className="justify-end flex">
-          <InstructionQueue instructions={instructionQueue} />
         </div>
       </div>
     </div>
