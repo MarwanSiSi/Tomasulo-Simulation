@@ -2,11 +2,11 @@ from src.enums import Opcode
 
 
 class StationEntry:
-    def __init__(self) -> None:
-        self.busy: bool = False
-        self.op: Opcode
-        self.vj: int = 0
-        self.vk: int = 0
-        self.qj: str | None = None
-        self.qk: str | None = None
-        self.a: int = 0
+    def __init__(self, cycles_required: int) -> None:
+        self.busy = False
+        self.op = None
+        self.vj = None
+        self.vk = None
+        self.qj = None
+        self.qk = None
+        self.cycles_remaining = cycles_required
