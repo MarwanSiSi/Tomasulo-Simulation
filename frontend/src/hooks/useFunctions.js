@@ -1,14 +1,7 @@
-import { useState } from "react";
 import axios from "axios";
+import { useState } from "react";
 
-export const useFunctions = ({
-  setFloatAddSubStations,
-  setFloatMulDivStations,
-  setIntAddSubStations,
-
-  setLoadStations,
-  setStoreStations,
-}) => {
+export const useFunctions = () => {
   const [instructions, setInstructions] = useState([]);
   const [hasLoop, setHasLoop] = useState(false);
   const [cycle, setCycle] = useState(0);
@@ -23,7 +16,7 @@ export const useFunctions = ({
           ...acc,
           [`R${idx}`]: { value: 0, busy: false, station: null },
         }),
-        {}
+        {},
       ),
     ...Array(32)
       .fill()
@@ -32,7 +25,7 @@ export const useFunctions = ({
           ...acc,
           [`F${idx}`]: { value: 0, busy: false, station: null },
         }),
-        {}
+        {},
       ),
   });
   const [pinnedRegisters, setPinnedRegisters] = useState(new Set());
@@ -84,39 +77,11 @@ export const useFunctions = ({
       } catch (error) {
         console.error("Error parsing register file:", error);
         alert(
-          "Invalid register file format. Expected format: R0=1,R1=2,F0=3.14,F1=2.5"
+          "Invalid register file format. Expected format: R0=1,R1=2,F0=3.14,F1=2.5",
         );
       }
     };
     reader.readAsText(file);
-  };
-
-  const nextCycle = async () => {
-    const res = await axios.get(`http://localhost:8080/cycle`);
-
-    const { data } = res;
-
-    const { cache, instruction_queue, registers, stations } = data;
-
-    console.log(instruction_queue);
-    setInstructionQueue(instruction_queue);
-
-    setRegisterFile(registers);
-
-    setFloatAddSubStations(stations.AF);
-
-    setFloatMulDivStations(stations.M);
-
-    setIntAddSubStations(stations.AI);
-
-    setLoadStations(stations.L);
-
-    setStoreStations(stations.S);
-
-    setCycle((prev) => prev + 1);
-
-    console.log(cache);
-    setCache(cache);
   };
 
   const handleReset = (resetAllStations) => {
@@ -133,7 +98,7 @@ export const useFunctions = ({
             ...acc,
             [`R${idx}`]: { value: 0, busy: false, station: null },
           }),
-          {}
+          {},
         ),
       ...Array(32)
         .fill()
@@ -142,9 +107,10 @@ export const useFunctions = ({
             ...acc,
             [`F${idx}`]: { value: 0, busy: false, station: null },
           }),
-          {}
+          {},
         ),
     });
+    axios.post("http://localhost:8080/reset");
   };
 
   return {
@@ -155,12 +121,13 @@ export const useFunctions = ({
     pinnedRegisters,
     handleFileUpload,
     handleRegFileUpload,
-    nextCycle,
     handleReset,
     setPinnedRegisters,
     setRegisterFile,
     instructionQueue,
     setInstructionQueue,
     cache,
+    setCycle,
+    setCache,
   };
 };
