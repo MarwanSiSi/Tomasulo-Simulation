@@ -21,7 +21,7 @@ class Simulator:
         self.__instance = self
         self.pc: int = 0
         self.cycle: int = 0
-        self.program: str = ""
+        self.program: list[Instruction] = []
         self.memory_manager: MemoryManager = MemoryManager()
         self.register_file: RegisterFile = RegisterFile()
         self.reservation_stations: list[Station] = []
@@ -38,6 +38,11 @@ class Simulator:
 
     def update(self) -> None:
         self.cycle += 1
+        self.pc += 1
+
+        if self.pc < len(self.program):
+            self.instruction_queue.append(self.program[self.pc])
+
         self.issue()
 
         self.cdb.set_invalid()

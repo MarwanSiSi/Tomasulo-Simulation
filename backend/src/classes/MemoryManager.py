@@ -24,7 +24,6 @@ class MemoryManager:
         self.block_size = block_size
         self.cache = Cache()
         self.data_memory: dict[int, int | float] = {}
-        self.instruction_memory: dict[int, int | float] = {}
         self.requests: dict[str, MemoryManager.Request] = {}
         self.simulatior = Simulator.get_instance()
 
