@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from .Cache import Cache
 from .CDB import CDB
-from src.exceptions import MemoryAccessException, CDBException
+from src.exceptions import MemoryAccessException
 
 
 class MemoryManager:
@@ -13,7 +13,7 @@ class MemoryManager:
         ctime: int
         etime: int
         address: int
-        value: int | float
+        value: int | float | None
 
     def __init__(self, latency: int = 1, penalty: int = 5, block_size: int = 1024):
         self.latency = latency
@@ -42,27 +42,20 @@ class MemoryManager:
                 self.transfer_to_cache(address)
 
             if tag.upper().startswith("L"):
-                value = 0
                 try:
-                    value = self.cache.read(address)
+                    request.value = self.cache.read(address)
                 except MemoryAccessException:
                     request.etime += self.penalty
-                    continue
-
-                try:
-                    self.cdb.write(tag, value)
-                    self.requests.remove(request)
-                except CDBException:
-                    pass
             elif tag.upper().startswith("S"):
                 try:
-                    self.cache.write(address, value)
+                    self.cache.write(address, value or 0)
                     self.requests.remove(request)
                 except MemoryAccessException:
                     request.etime += self.penalty
-                    continue
+            else:
+                raise ValueError(f"Invalid tag: {tag}")
 
-    def request_write(self, tag: str, address: int, value: int | float, ctime: int):
+    def request_store(self, tag: str, address: int, value: int | float, ctime: int):
         stime = ctime
         etime = self.latency
 
@@ -70,12 +63,12 @@ class MemoryManager:
             MemoryManager.Request(tag, stime, ctime, etime, address, value)
         )
 
-    def request_read(self, tag: str, address: int, ctime: int):
+    def request_load(self, tag: str, address: int, ctime: int):
         stime = ctime
         etime = self.latency
 
         self.requests.append(
-            MemoryManager.Request(tag, stime, ctime, etime, address, 0)
+            MemoryManager.Request(tag, stime, ctime, etime, address, None)
         )
 
     def transfer_to_cache(self, address: int):
