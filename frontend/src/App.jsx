@@ -14,9 +14,6 @@ import axios from "axios";
 function App() {
   const { config, setConfig } = useConfig();
 
-  const [cache, setCache] = useState([]);
-  const [instructionQueue, setInstructionQueue] = useState([]);
-
   const {
     floatAddSubStations,
     floatMulDivStations,
@@ -33,6 +30,9 @@ function App() {
     setLoadStations,
     setStoreStations,
 
+    instructionQueue,
+    setInstructionQueue,
+
     resetAllStations,
   } = useStations(config);
 
@@ -48,6 +48,7 @@ function App() {
     handleReset,
     setPinnedRegisters,
     setRegisterFile,
+    cache,
   } = useFunctions();
 
   console.log(intAddSubStations);
@@ -140,64 +141,6 @@ function App() {
         </div>
       </div>
       <div className="mt-8 w-full flex justify-between gap-7">
-        <ExecTable
-          data={[
-            {
-              OP: "ADD",
-              Dest: "R2",
-              j: "R3",
-              k: "R4",
-              issue: 5,
-              execComp: 6,
-              writeResult: 7,
-            },
-            {
-              OP: "LD",
-              Dest: "F0",
-              j: null,
-              k: "R1",
-              issue: 5,
-              execComp: 6,
-              writeResult: 7,
-            },
-            {
-              OP: "SD",
-              Dest: null,
-              j: "F0",
-              k: "R1",
-              issue: 5,
-              execComp: 6,
-              writeResult: 7,
-            },
-            {
-              OP: "SD",
-              Dest: null,
-              j: "F0",
-              k: "R1",
-              issue: 5,
-              execComp: 6,
-              writeResult: 7,
-            },
-            {
-              OP: "SD",
-              Dest: null,
-              j: "F0",
-              k: "R1",
-              issue: 5,
-              execComp: 6,
-              writeResult: 7,
-            },
-            {
-              OP: "SD",
-              Dest: null,
-              j: "F0",
-              k: "R1",
-              issue: 5,
-              execComp: 6,
-              writeResult: 7,
-            },
-          ]}
-        />
         <div className="justify-end flex">
           <InstructionQueue instructions={instructionQueue} />
         </div>

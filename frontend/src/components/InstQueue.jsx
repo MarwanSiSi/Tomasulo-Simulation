@@ -18,7 +18,7 @@ const InstructionQueue = ({ instructions }) => {
                 <td className="border p-2 text-center text-gray-500">Empty</td>
               </tr>
             )} */}
-            {instructions.map((instruction, index) => (
+            {instructions?.map((instruction, index) => (
               <tr key={index}>
                 <td className="border p-2 text-center">{instruction}</td>
               </tr>

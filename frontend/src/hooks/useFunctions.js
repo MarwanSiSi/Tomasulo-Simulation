@@ -1,10 +1,25 @@
 import { useState } from "react";
 import axios from "axios";
+import { useStations } from "./useStations";
+import { useConfig } from "./useConfig";
 
 export const useFunctions = () => {
   const [instructions, setInstructions] = useState([]);
   const [hasLoop, setHasLoop] = useState(false);
   const [cycle, setCycle] = useState(0);
+  const [instructionQueue, setInstructionQueue] = useState([]);
+  const [cache, setCache] = useState([]);
+
+  const { config } = useConfig();
+
+  const {
+    setFloatAddSubStations,
+    setFloatMulDivStations,
+    setIntAddSubStations,
+
+    setLoadStations,
+    setStoreStations,
+  } = useStations(config);
 
   const [registerFile, setRegisterFile] = useState({
     ...Array(32)
@@ -84,8 +99,37 @@ export const useFunctions = () => {
     reader.readAsText(file);
   };
 
-  const nextCycle = () => {
-    setCycle((prev) => prev + 1);
+  const nextCycle = async () => {
+    const res = await axios.get(`http://localhost:8080/cycle`);
+    console.log("res", res.data);
+
+    const { data } = res;
+
+    const { cache, cycle, instruction_queue, registers, stations } = data;
+
+    // console.log("cache", cache);
+    // console.log("cycle", cycle);
+    // console.log("instruction_queue", instruction_queue);
+    // console.log("registers", registers);
+    // console.log("stations", stations);
+
+    setInstructionQueue(instruction_queue);
+
+    setRegisterFile(registers);
+
+    setFloatAddSubStations(stations.AF);
+
+    setFloatMulDivStations(stations.M);
+
+    setIntAddSubStations(stations.AI);
+
+    setLoadStations(stations.L);
+
+    setStoreStations(stations.S);
+
+    setCycle(cycle);
+
+    setCache(cache);
   };
 
   const handleReset = (resetAllStations) => {
@@ -128,5 +172,8 @@ export const useFunctions = () => {
     handleReset,
     setPinnedRegisters,
     setRegisterFile,
+    instructionQueue,
+    setInstructionQueue,
+    cache,
   };
 };
