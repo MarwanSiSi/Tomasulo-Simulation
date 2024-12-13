@@ -46,6 +46,7 @@ class Register(BaseModel):
 
 
 class Cycle(BaseModel):
+    cycle: int
     stations: dict[str, dict[str, ReservationStation]]
     registers: dict[str, Register]
     instruction_queue: list[str]
@@ -75,6 +76,7 @@ async def set_config(config: Config):
 async def get_cycle() -> Cycle:
     simulator.update()
     return Cycle(
+        cycle=simulator.cycle,
         stations=await get_stations(),
         registers=await get_register_file(),
         instruction_queue=await get_instruction_queue(),
