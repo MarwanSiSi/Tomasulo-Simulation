@@ -94,7 +94,6 @@ class AddStation(Station):
                     print(
                         f"{self.name}: Executed ADD/SUB at slot {index}, result = {result}."
                     )
-                    self.complete_entry(index)
                 except Exception as e:
                     print(f"{self.name}: Error at slot {index}: {e}")
 
@@ -135,7 +134,6 @@ class MulStation(Station):
                     print(
                         f"{self.name}: Executed MUL/DIV at slot {index}, result = {result}."
                     )
-                    self.complete_entry(index)
                 except ZeroDivisionError as e:
                     print(f"{self.name}: Division by zero at slot {index}: {e}")
                 except Exception as e:
@@ -175,7 +173,6 @@ class LoadStation(Station):
                     print(
                         f"{self.name}: Executed LOAD at slot {index}, value = {result}."
                     )
-                    self.complete_entry(index)
                 except Exception as e:
                     print(f"{self.name}: Error at slot {index}: {e}")
 
@@ -213,6 +210,5 @@ class StoreStation(Station):
                     print(
                         f"{self.name}: Executed STORE at slot {index}, value = {entry.a}."
                     )
-                    self.complete_entry(index)
                 except Exception as e:
                     print(f"{self.name}: Error at slot {index}: {e}")

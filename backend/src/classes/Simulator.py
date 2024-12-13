@@ -7,7 +7,12 @@ from .RegisterFile import RegisterFile
 
 
 class Simulator:
+    __instance = None
+
     def __init__(self) -> None:
+        if Simulator.__instance is not None:
+            raise Exception("This class is a singleton!")
+
         self.pc: int = 0
         self.cycle: int = 0
         self.program: str = ""
@@ -16,6 +21,13 @@ class Simulator:
         self.reservation_stations: list = []
         self.cdb = CDB.get_instance()
         self.instruction_queue: deque[Instruction] = deque()
+
+    @staticmethod
+    def get_instance() -> "Simulator":
+        if Simulator.__instance is None:
+            Simulator.__instance = Simulator()
+
+        return Simulator.__instance
 
     def update(self) -> None:
         self.cycle += 1

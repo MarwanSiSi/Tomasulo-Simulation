@@ -1,9 +1,10 @@
-from src.enums import Opcode
+from src.enums import Opcode, StationState
 
 
 class StationEntry:
     def __init__(self, tag: str, cycles_required: int) -> None:
         self.tag: str = tag
+        self.state: StationState = StationState.READY
         self.busy = False
         self.op: Opcode | None = None
         self.vj: int | float = 0
@@ -15,6 +16,7 @@ class StationEntry:
 
     def reset(self) -> None:
         self.busy = False
+        self.state = StationState.READY
         self.op = None
         self.vj = 0
         self.vk = 0
