@@ -18,11 +18,11 @@ class Simulator:
         self.memory_manager: MemoryManager = MemoryManager(self)
         self.register_file: RegisterFile = RegisterFile(self)
         self.reservation_stations: list[Station] = [
-            AddStation(self, "Add/Sub Int Station", 1, 1, "AI"),
-            AddStation(self, "Add/Sub Float Station", 1, 1, "AF"),
-            MulStation(self, "Mul/Div Float Station", 1, 1, "MF"),
-            LoadStation(self, "Load Station", 1, 1, "L"),
-            StoreStation(self, "Store Station", 1, 1, "S"),
+            AddStation(self, "AI", 1, 1, "AI"),
+            AddStation(self, "AF", 1, 1, "AF"),
+            MulStation(self, "M", 1, 1, "MF"),
+            LoadStation(self, "L", 1, 1, "L"),
+            StoreStation(self, "S", 1, 1, "S"),
         ]
         self.cdb = CDB()
         self.instruction_queue: deque[Instruction] = deque()

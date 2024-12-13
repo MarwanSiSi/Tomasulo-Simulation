@@ -4,6 +4,7 @@ from src.enums import InstructionType, Opcode, Registers
 class Instruction:
     def __init__(
         self,
+        original: str,
         instr_type: InstructionType,
         opcode: Opcode,
         immediate: int | None = None,
@@ -13,10 +14,16 @@ class Instruction:
     ):
         self.instr_type = instr_type  # R-type, I-type, or J-type
         self.opcode = opcode  # Opcode from the Opcode enum
-        self.immediate = int(immediate) if immediate is not None else None # Memory immediate (for load/store or label)
+        self.immediate = (
+            int(immediate) if immediate is not None else None
+        )  # Memory immediate (for load/store or label)
         self.src = src  # Source register (Registers enum)
         self.target = target  # Target register (Registers enum)
         self.dest = dest  # Destination register (Registers enum)
+        self.original: str = original  # Original instruction string
+
+    def __str__(self):
+        return self.original
 
     def __repr__(self):
         return (
@@ -41,6 +48,7 @@ class Instruction:
         Parses a single line of instruction and returns an Instruction object.
         Handles labels as well.
         """
+        orignal_line = line
         line = line.strip()
 
         # Check for a label
@@ -74,7 +82,9 @@ class Instruction:
         }:
             instr_type = InstructionType.R_TYPE
             dest, src, target = map(Instruction.parse_register, operands)
-            return Instruction(instr_type, opcode, src=src, target=target, dest=dest)
+            return Instruction(
+                orignal_line, instr_type, opcode, src=src, target=target, dest=dest
+            )
 
         elif opcode in {
             Opcode.L_D,
@@ -92,19 +102,26 @@ class Instruction:
                 target, immediate = operands[0], operands[1]
                 target = Instruction.parse_register(target)
                 return Instruction(
-                    instr_type, opcode, target=target, immediate=immediate
+                    orignal_line, instr_type, opcode, target=target, immediate=immediate
                 )
             else:
                 target, src = operands[0], temp
                 target = Instruction.parse_register(target)
-                return Instruction(instr_type, opcode, target=target, src=src)
+                return Instruction(
+                    orignal_line, instr_type, opcode, target=target, src=src
+                )
 
         elif opcode in {Opcode.DADDI, Opcode.DSUBI}:
             instr_type = InstructionType.I_TYPE
             dest, src = map(Instruction.parse_register, operands[0:2])
             immediate = operands[2]
             return Instruction(
-                instr_type, opcode, src=src, dest=dest, immediate=immediate
+                orignal_line,
+                instr_type,
+                opcode,
+                src=src,
+                dest=dest,
+                immediate=immediate,
             )
 
         elif opcode in {Opcode.BNE, Opcode.BEQ}:
@@ -114,7 +131,12 @@ class Instruction:
             target = Instruction.parse_register(target)
             immediate = labels[immediate] if immediate in labels else int(immediate)
             return Instruction(
-                instr_type, opcode, immediate=immediate, src=src, target=target
+                orignal_line,
+                instr_type,
+                opcode,
+                immediate=immediate,
+                src=src,
+                target=target,
             )
 
         else:
