@@ -21,7 +21,7 @@ class RegisterFile:
         """
         Retrieve the value or reservation station tag of a register by its name.
         :param name: Name of the register.
-        :return: The value or station tag of the register, or None if not found.
+        :return: The value or station tag of the register.
         """
         if name.value in self.registers:
             return self.registers[name.value].get()

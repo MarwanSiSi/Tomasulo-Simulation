@@ -1,14 +1,13 @@
 from collections import deque
 
-from .Station.StationEntry import StationEntry
-from src.enums import StationState, Opcode, Registers
+from src.enums import Opcode, StationState
 
 from .CDB import CDB
 from .Instruction import Instruction
 from .MemoryManager import MemoryManager
 from .RegisterFile import RegisterFile
-from .Station.Station import Station, AddStation, MulStation, LoadStation, StoreStation
-from src.classes import Instruction, Register, RegisterFile
+from .Station.Station import AddStation, LoadStation, MulStation, Station, StoreStation
+from .Station.StationEntry import StationEntry
 
 
 class Simulator:
@@ -63,18 +62,15 @@ class Simulator:
         self.write_back()
 
     def instruction_to_station_entry(
-    self,
-    instruction: Instruction,
-) -> StationEntry:
-
+        self,
+        instruction: Instruction,
+    ) -> StationEntry:
         station = StationEntry()
         station.op = instruction.opcode
 
         # Handle the source register (vj, qj)
-        src = self.register_file.get_register(instruction.src)
-        target = self.register_file.get_register(instruction.src)
-        if src:
-            if instruction.opcode in {
+
+        if instruction.opcode in {
             Opcode.ADD_D,
             Opcode.SUB_D,
             Opcode.MUL_D,
@@ -83,26 +79,37 @@ class Simulator:
             Opcode.SUB_S,
             Opcode.MUL_S,
             Opcode.DIV_S,
-            }:
-                if src.Q:
-                    station.qj = src.Q
-                else:
-                    station.vj = src.get()
-                # Handle the target register (vk, qk)
-                if target:
-                    if target.Q:
-                        station.qk = target.Q
-                    else:
-                        station.vk = target.get()
+        }:
+            assert instruction.src is not None
+            assert instruction.target is not None
 
-            elif instruction.Opcode in {Opcode.DADDI, Opcode.DSUBI}:
-                if src.Q:
-                    station.qj = src.Q
-                else:
-                    station.vj = src.get()
-                station.a = instruction.immediate
+            src = self.register_file.get_register(instruction.src)
+            target = self.register_file.get_register(instruction.target)
 
-            elif instruction.Opcode in {
+            if isinstance(src, str):
+                station.qj = src
+            else:
+                station.vj = src
+
+            if isinstance(target, str):
+                station.qk = target
+            else:
+                station.vk = target
+
+        elif instruction.opcode in {Opcode.DADDI, Opcode.DSUBI}:
+            assert instruction.src is not None
+            assert instruction.immediate is not None
+
+            src = self.register_file.get_register(instruction.src)
+
+            if isinstance(src, str):
+                station.qj = src
+            else:
+                station.vj = src
+
+            station.a = instruction.immediate
+
+        elif instruction.opcode in {
             Opcode.L_D,
             Opcode.L_S,
             Opcode.LW,
@@ -111,62 +118,123 @@ class Simulator:
             Opcode.S_S,
             Opcode.SW,
             Opcode.SD,
-            }:
-                if target:
-                    if target.Q:
-                        station.qk = target.Q
-                    else:
-                        station.vk = target.get()
-                if src:
-                    if src.q:
-                        station.qj = src.Q
-                    else:
-                        station.vj = src.get()
+        }:
+            assert instruction.target is not None
+
+            target = self.register_file.get_register(instruction.target)
+
+            if isinstance(target, str):
+                station.qk = target
+            else:
+                station.vk = target
+
+            if instruction.src is not None:
+                src = self.register_file.get_register(instruction.src)
+
+                if isinstance(src, str):
+                    station.qj = src
                 else:
-                    station.a = instruction.immediate
+                    station.vj = src
+            else:
+                assert instruction.immediate is not None
+                station.a = instruction.immediate
 
         # Mark the reservation station as busy
         station.busy = True
 
         return station
 
-
-
     def issue(self) -> None:
         if len(self.instruction_queue) == 0:
             return
-        
-        instruction = self.instruction_to_station_entry(self.instruction_queue[0])
 
-        if instruction.opcode in {Opcode.DADDI, Opcode.DSUBI}:
-            result = self.reservation_stations[0].assign_entry(instruction, self.cycle)
-        elif instruction.opcode in {
+        instruction = self.instruction_queue[0]
+
+        if instruction.opcode in {Opcode.BEQ, Opcode.BNE}:
+            assert instruction.src is not None
+            assert instruction.target is not None
+            assert instruction.immediate is not None
+
+            src = self.register_file.get_register(instruction.src)
+            target = self.register_file.get_register(instruction.target)
+
+            if isinstance(src, str):
+                tag, value, _ = self.cdb.read()
+                if tag == src:
+                    src = value
+
+            if isinstance(target, str):
+                tag, value, _ = self.cdb.read()
+                if tag == target:
+                    target = value
+
+            if isinstance(src, str) or isinstance(target, str):
+                return
+
+            if instruction.opcode == Opcode.BEQ:
+                if src == target:
+                    self.pc = instruction.immediate
+                    self.instruction_queue.clear()
+
+            elif instruction.opcode == Opcode.BNE:
+                if src != target:
+                    self.pc = instruction.immediate
+                    self.instruction_queue.clear()
+
+            return
+
+        station_entry = self.instruction_to_station_entry(instruction)
+
+        if station_entry.op in {Opcode.DADDI, Opcode.DSUBI}:
+            result = self.reservation_stations[0].assign_entry(
+                station_entry, self.cycle
+            )
+            if result is not None:
+                assert instruction.dest is not None
+                self.register_file.update_register(instruction.dest, result)
+
+        elif station_entry.op in {
             Opcode.ADD_D,
             Opcode.ADD_S,
             Opcode.SUB_D,
             Opcode.SUB_S,
         }:
-            result = self.reservation_stations[1].assign_entry(instruction, self.cycle)
-        elif instruction.opcode in {
+            result = self.reservation_stations[1].assign_entry(
+                station_entry, self.cycle
+            )
+            if result is not None:
+                assert instruction.dest is not None
+                self.register_file.update_register(instruction.dest, result)
+
+        elif station_entry.op in {
             Opcode.MUL_D,
             Opcode.MUL_S,
             Opcode.DIV_D,
             Opcode.DIV_S,
         }:
-            result = self.reservation_stations[2].assign_entry(instruction, self.cycle)
-        elif instruction.opcode in {Opcode.LW, Opcode.LD, Opcode.L_S, Opcode.L_D}:
-            result = self.reservation_stations[3].assign_entry(instruction, self.cycle)
-        elif instruction.opcode in {Opcode.SW, Opcode.SD, Opcode.S_S, Opcode.S_D}:
-            result = self.reservation_stations[4].assign_entry(instruction, self.cycle)
-        elif instruction.opcode == Opcode.BEQ or instruction.opcode == Opcode.BNE:
-            assert instruction.immediate is not None
-            result = False
-            self.pc = instruction.immediate
-            self.instruction_queue.clear()
-        else:
-            raise ValueError(f"Unhandled opcode: {instruction.opcode}")
+            result = self.reservation_stations[2].assign_entry(
+                station_entry, self.cycle
+            )
+            if result is not None:
+                assert instruction.dest is not None
+                self.register_file.update_register(instruction.dest, result)
 
-        if result:
+        elif station_entry.op in {Opcode.LW, Opcode.LD, Opcode.L_S, Opcode.L_D}:
+            result = self.reservation_stations[3].assign_entry(
+                station_entry, self.cycle
+            )
+            if result is not None:
+                assert instruction.dest is not None
+                self.register_file.update_register(instruction.dest, result)
+
+        elif station_entry.op in {Opcode.SW, Opcode.SD, Opcode.S_S, Opcode.S_D}:
+            result = self.reservation_stations[4].assign_entry(
+                station_entry, self.cycle
+            )
+        else:
+            raise ValueError(f"Unhandled opcode: {station_entry.op}")
+
+        if result is not None:
             self.instruction_queue.popleft()
 
     def write_back(self) -> None:

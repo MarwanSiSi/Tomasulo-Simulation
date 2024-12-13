@@ -28,7 +28,7 @@ class Station(ABC):
         """Updates the station logic, including checking readiness and executing entries."""
         pass
 
-    def assign_entry(self, entry: StationEntry, time: int) -> bool:
+    def assign_entry(self, entry: StationEntry, time: int) -> str | None:
         """
         Assigns a new entry to the station if a slot is available.
         Returns True if the entry is successfully assigned; False otherwise.
@@ -47,11 +47,10 @@ class Station(ABC):
             station_entry.cycles_remaining = self.latency
             station_entry.state = StationState.WAITING
             station_entry.start_cycle = time
-            print(f"{self.name}: Assigned entry {entry}")
-            return True
 
-        print(f"{self.name}: No available slots to assign entry {entry}.")
-        return False
+            return entry.tag
+
+        return None
 
     def complete_entry(self, index: int):
         """Marks the entry at the given index as completed."""

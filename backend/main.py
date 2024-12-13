@@ -1,14 +1,10 @@
-from src.enums import Opcode
-from src.classes.Station.StationEntry import StationEntry
-from src.utils.helpers import execute_station_entry
+from pprint import pprint
+from src.classes.Instruction import Instruction
 
 
 if __name__ == "__main__":
-    entry = StationEntry()
-    entry.busy = True
-    entry.op = Opcode.ADD_D
-    entry.vj = 5
-    entry.vk = 3
-    result = execute_station_entry(entry)
-    if result is not None:
-        print(f"Execution result: {result}")
+    pprint(
+        Instruction.parse_instructions_file(
+            "/home/ahmedgado/SharedDisk/GUC/Tomasulo-Simulation/instructions.txt"
+        )
+    )
