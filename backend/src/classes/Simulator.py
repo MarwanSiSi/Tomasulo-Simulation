@@ -26,7 +26,9 @@ class Simulator:
         self.register_file: RegisterFile = RegisterFile()
         self.reservation_stations: list[Station] = []
         self.reservation_stations.append(AddStation("Add/Sub Int Station", 1, 1, "AI"))
-        self.reservation_stations.append(AddStation("Add/Sub Float Station", 1, 1, "AF"))
+        self.reservation_stations.append(
+            AddStation("Add/Sub Float Station", 1, 1, "AF")
+        )
         self.reservation_stations.append(MulStation("Mul/Div Float Station", 1, 1, "M"))
         self.reservation_stations.append(LoadStation("Load Station", 1, 1, "L"))
         self.reservation_stations.append(StoreStation("Store Station", 1, 1, "S"))
@@ -65,20 +67,37 @@ class Simulator:
 
         instruction = self.instruction_queue[0]
 
-        if instruction.opcode in {Opcode.DADDI,Opcode.DSUBI}:
+        if instruction.opcode in {Opcode.DADDI, Opcode.DSUBI}:
             result = self.reservation_stations[0].assign_entry(instruction, self.cycle)
-        elif instruction.opcode in {Opcode.ADD_D, Opcode.ADD_S, Opcode.SUB_D, Opcode.SUB_S}:
+        elif instruction.opcode in {
+            Opcode.ADD_D,
+            Opcode.ADD_S,
+            Opcode.SUB_D,
+            Opcode.SUB_S,
+        }:
             result = self.reservation_stations[1].assign_entry(instruction, self.cycle)
-        elif instruction.opcode in {Opcode.MUL_D, Opcode.MUL_S, Opcode.DIV_D, Opcode.DIV_S}:
+        elif instruction.opcode in {
+            Opcode.MUL_D,
+            Opcode.MUL_S,
+            Opcode.DIV_D,
+            Opcode.DIV_S,
+        }:
             result = self.reservation_stations[2].assign_entry(instruction, self.cycle)
         elif instruction.opcode in {Opcode.LW, Opcode.LD, Opcode.L_S, Opcode.L_D}:
             result = self.reservation_stations[3].assign_entry(instruction, self.cycle)
         elif instruction.opcode in {Opcode.SW, Opcode.SD, Opcode.S_S, Opcode.S_D}:
             result = self.reservation_stations[4].assign_entry(instruction, self.cycle)
+        elif instruction.opcode == Opcode.BEQ or instruction.opcode == Opcode.BNE:
+            assert instruction.immediate is not None
+            result = False
+            self.pc = instruction.immediate
+            self.instruction_queue.clear()
+        else:
+            raise ValueError(f"Unhandled opcode: {instruction.opcode}")
 
         if result:
             self.instruction_queue.popleft()
-            
+
     def write_back(self) -> None:
         finished: list[StationEntry] = []
 

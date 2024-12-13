@@ -190,7 +190,7 @@ class StoreStation(Station):
             if not entry.busy:
                 continue
 
-            if entry.qj is None:
+            if entry.qj is None or entry.qk is not None:
                 if not valid:
                     continue
 
