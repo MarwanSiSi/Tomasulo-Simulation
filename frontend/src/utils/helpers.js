@@ -1,5 +1,5 @@
 // Helper function to create empty arithmetic station
-export const createEmptyArithmeticStation = () => ({
+export const createEmptyStation = () => ({
   busy: false,
   op: null,
   vj: null,
@@ -9,22 +9,8 @@ export const createEmptyArithmeticStation = () => ({
   address: null,
 });
 
-// Helper function to create empty store station
-export const createEmptyStoreStation = () => ({
-  busy: false,
-  address: null,
-  v: null,
-  q: null,
-});
-
-// Helper function to create empty load station
-export const createEmptyLoadStation = () => ({
-  busy: false,
-  address: null,
-});
-
 // Helper function to create stations dynamically
-export const createStations = (prefix, size, createEmptyStation) => {
+export const createStations = (prefix, size) => {
   return Array(size)
     .fill()
     .reduce(

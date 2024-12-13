@@ -2,31 +2,35 @@ import PropTypes from "prop-types";
 
 const InstructionQueue = ({ instructions }) => {
   return (
-    <div className="border rounded-lg shadow-md max-w-md">
-      <div className="bg-gray-100 p-3 border-b font-semibold text-lg">
-        Instruction Queue
-      </div>
-      <div className="divide-y">
-        {instructions.length > 0 ? (
-          instructions.map((instruction, index) => (
-            <div
-              key={index}
-              className={`p-3 ${
-                index === 0 ? "bg-blue-50" : "bg-white"
-              } hover:bg-gray-50 transition-colors duration-200`}
-            >
-              {instruction}
-            </div>
-          ))
-        ) : (
-          <div className="text-center text-gray-500 p-4">Queue is empty</div>
-        )}
+    <div className="min-w-[400px]">
+      <h2 className="text-xl font-bold mb-2">Instruction Queue</h2>
+      <div className="overflow-y-auto max-h-56">
+        <table className="min-w-full border ">
+          <tbody>
+            {/* {instructions?.length > 0 ? (
+              instructions?.map((instruction, index) => (
+                <tr key={index}>
+                  <td className="border p-2 text-center">{instruction}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td className="border p-2 text-center text-gray-500">Empty</td>
+              </tr>
+            )} */}
+            {instructions.map((instruction, index) => (
+              <tr key={index}>
+                <td className="border p-2 text-center">{instruction}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
 };
 InstructionQueue.propTypes = {
-  instructions: PropTypes.array.isRequired,
+  instructions: PropTypes.array,
 };
 
 export default InstructionQueue;
