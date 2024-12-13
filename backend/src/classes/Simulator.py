@@ -18,11 +18,11 @@ class Simulator:
         self.memory_manager: MemoryManager = MemoryManager(self)
         self.register_file: RegisterFile = RegisterFile(self)
         self.reservation_stations: list[Station] = [
-            AddStation(self, "AI", 1, 1, "AI"),
-            AddStation(self, "AF", 1, 1, "AF"),
-            MulStation(self, "M", 1, 1, "MF"),
-            LoadStation(self, "L", 1, 1, "L"),
-            StoreStation(self, "S", 1, 1, "S"),
+            AddStation(self, "AI", 4, 1, "AI"),
+            AddStation(self, "AF", 4, 1, "AF"),
+            MulStation(self, "M", 4, 1, "MF"),
+            LoadStation(self, "L", 4, 1, "L"),
+            StoreStation(self, "S", 4, 1, "S"),
         ]
         self.cdb = CDB()
         self.instruction_queue: deque[Instruction] = deque()
@@ -53,6 +53,7 @@ class Simulator:
             station.update(self.cycle)
 
         self.write_back()
+        self.read_all()
 
     def instruction_to_station_entry(
         self,
@@ -246,3 +247,25 @@ class Simulator:
         self.cdb.write(finished[0].tag, finished[0].result)
         finished[0].busy = False
         finished[0].state = StationState.READY
+
+    def read_all(self):
+        for register in self.register_file.registers.values():
+            if register.Q is not None:
+                tag, value, _ = self.cdb.read()
+                if tag == register.Q:
+                    register.Q = None
+                    register.value = value
+
+        for staion in self.reservation_stations:
+            for entry in staion.entries:
+                if entry.qj is not None:
+                    tag, value, _ = self.cdb.read()
+                    if tag == entry.qj:
+                        entry.qj = None
+                        entry.vj = value
+
+                if entry.qk is not None:
+                    tag, value, _ = self.cdb.read()
+                    if tag == entry.qk:
+                        entry.qk = None
+                        entry.vk = value

@@ -16,6 +16,12 @@ class Station(ABC):
         ]
         self.simulator = simulator
 
+    def set_size(self, size: int):
+        self.size = size
+        self.entries = [
+            StationEntry(f"{self.name}{i + 1}", self.latency) for i in range(size)
+        ]
+
     def __str__(self):
         return f"{self.name}: {self.entries}"
 
