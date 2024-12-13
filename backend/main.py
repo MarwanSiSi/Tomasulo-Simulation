@@ -66,9 +66,9 @@ class Cycle(BaseModel):
 @app.post("/config")
 async def set_config(config: Config):
     simulator.load_program(config.filePath)
-    simulator.reservation_stations[0].size = config.intAddSubStationSize
-    simulator.reservation_stations[1].size = config.floatAddSubStationSize
-    simulator.reservation_stations[2].size = config.floatMulDivStationSize
+    simulator.reservation_stations[0].set_size(config.intAddSubStationSize)
+    simulator.reservation_stations[1].set_size(config.floatAddSubStationSize)
+    simulator.reservation_stations[2].set_size(config.floatMulDivStationSize)
 
     simulator.reservation_stations[0].latency = config.intAddSubLatency
     simulator.reservation_stations[1].latency = config.floatAddSubLatency

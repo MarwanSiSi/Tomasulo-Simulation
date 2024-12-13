@@ -58,18 +58,6 @@ function App() {
     setStoreStations,
   });
 
-  // things to be sent on mount : addSubLatency, mulDivLatency, intAddSubLatency, loadBufferSize, storeBufferSize, floatAddSubStationSize, floatMulDivStationSize, intAddSubStationSize, cacheHitLatency, cacheMissLatency, cacheSize, blockSize
-  useEffect(() => {
-    axios
-      .post("http://0.0.0.0:8080/config", config)
-      .then((response) => {
-        console.log("Config posted successfully:", response.data);
-      })
-      .catch((error) => {
-        console.error("Error posting config:", error);
-      });
-  }, []);
-
   return (
     <div className="p-6 max-w-full mx-auto">
       <div className="mb-8 flex justify-between items-center">
