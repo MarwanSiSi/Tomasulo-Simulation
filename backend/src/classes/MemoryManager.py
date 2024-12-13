@@ -15,6 +15,8 @@ class MemoryManager:
         etime: int
         address: int
         value: int | float | None
+        result: int | float | None = None
+        done: bool = False
 
     def __init__(self, latency: int = 1, penalty: int = 5, block_size: int = 1024):
         self.latency = latency
@@ -23,12 +25,11 @@ class MemoryManager:
         self.cache = Cache()
         self.data_memory: dict[int, int | float] = {}
         self.instruction_memory: dict[int, int | float] = {}
-        self.requests: list[MemoryManager.Request] = []
+        self.requests: dict[str, MemoryManager.Request] = {}
         self.simulatior = Simulator.get_instance()
 
     def update(self):
-        for request in self.requests[:]:
-            tag = request.tag
+        for tag, request in self.requests.copy().items():
             stime = request.stime
             ctime = request.ctime
             etime = request.etime
@@ -44,13 +45,14 @@ class MemoryManager:
 
             if tag.upper().startswith("L"):
                 try:
-                    request.value = self.cache.read(address)
+                    request.result = self.cache.read(address)
+                    request.done = True
                 except MemoryAccessException:
                     request.etime += self.penalty
             elif tag.upper().startswith("S"):
                 try:
                     self.cache.write(address, value or 0)
-                    self.requests.remove(request)
+                    request.done = True
                 except MemoryAccessException:
                     request.etime += self.penalty
             else:
@@ -60,16 +62,16 @@ class MemoryManager:
         stime = ctime
         etime = self.latency
 
-        self.requests.append(
-            MemoryManager.Request(tag, stime, ctime, etime, address, value)
+        self.requests[tag] = MemoryManager.Request(
+            tag, stime, ctime, etime, address, value
         )
 
     def request_load(self, tag: str, address: int, ctime: int):
         stime = ctime
         etime = self.latency
 
-        self.requests.append(
-            MemoryManager.Request(tag, stime, ctime, etime, address, None)
+        self.requests[tag] = MemoryManager.Request(
+            tag, stime, ctime, etime, address, None
         )
 
     def transfer_to_cache(self, address: int):

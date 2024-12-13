@@ -165,28 +165,18 @@ class LoadStation(Station):
                     continue
 
                 if entry.qj == tag:
-                    entry.a = value
+                    entry.a = int(value)
                     entry.qj = None
 
                 continue
 
-            if entry.cycles_remaining > 0:  # Decrement cycles
-                entry.cycles_remaining -= 1
+            mem_request = self.simulator.memory_manager.requests.get(entry.tag, None)
+            if mem_request is not None and mem_request.result is not None:
+                entry.result = mem_request.result
+                entry.state = StationState.WRITING
+            elif mem_request is None:
+                self.simulator.memory_manager.request_load(entry.tag, entry.a, time)
                 entry.state = StationState.EXECUTING
-                print(
-                    f"{self.name}: LOAD in progress at slot {index}, "
-                    f"cycles remaining = {entry.cycles_remaining}."
-                )
-            else:  # Execute if all cycles are completed
-                try:
-                    result = entry.a
-                    entry.result = result
-                    entry.state = StationState.WRITING
-                    print(
-                        f"{self.name}: Executed LOAD at slot {index}, value = {result}."
-                    )
-                except Exception as e:
-                    print(f"{self.name}: Error at slot {index}: {e}")
 
 
 class StoreStation(Station):
@@ -205,24 +195,20 @@ class StoreStation(Station):
                     continue
 
                 if entry.qj == tag:
-                    entry.a = value
+                    entry.vj = int(value)
                     entry.qj = None
+
+                if entry.qk == tag:
+                    entry.a = int(value)
+                    entry.qk = None
 
                 continue
 
-            if entry.cycles_remaining > 0:  # Decrement cycles
-                entry.cycles_remaining -= 1
-                entry.state = StationState.EXECUTING
-                print(
-                    f"{self.name}: STORE in progress at slot {index}, "
-                    f"cycles remaining = {entry.cycles_remaining}."
+            mem_request = self.simulator.memory_manager.requests.get(entry.tag, None)
+            if mem_request is not None and mem_request.done:
+                entry.state = StationState.WRITING
+            elif mem_request is None:
+                self.simulator.memory_manager.request_store(
+                    entry.tag, entry.a, entry.vj, time
                 )
-            else:  # Execute if all cycles are completed
-                try:
-                    # Perform store operation; for now, we assume it succeeds
-                    entry.state = StationState.WRITING
-                    print(
-                        f"{self.name}: Executed STORE at slot {index}, value = {entry.a}."
-                    )
-                except Exception as e:
-                    print(f"{self.name}: Error at slot {index}: {e}")
+                entry.state = StationState.EXECUTING

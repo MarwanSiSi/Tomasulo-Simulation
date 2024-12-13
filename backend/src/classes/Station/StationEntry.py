@@ -11,7 +11,7 @@ class StationEntry:
         self.vk: int | float = 0
         self.qj: str | None = None
         self.qk: str | None = None
-        self.a: int | float = 0
+        self.a: int = 0
         self.start_cycle: int = 0
         self.cycles_remaining: int = cycles_required
         self.start_cycle: int =0
