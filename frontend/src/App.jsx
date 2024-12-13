@@ -7,9 +7,6 @@ import { useStations } from "./hooks/useStations";
 import { useConfig } from "./hooks/useConfig";
 import { useFunctions } from "./hooks/useFunctions";
 import InstructionQueue from "./components/InstQueue";
-import ExecTable from "./components/ExecTable";
-import { useEffect, useState } from "react";
-import axios from "axios";
 
 function App() {
   const { config, setConfig } = useConfig();
@@ -30,9 +27,6 @@ function App() {
     setLoadStations,
     setStoreStations,
 
-    instructionQueue,
-    setInstructionQueue,
-
     resetAllStations,
   } = useStations(config);
 
@@ -47,7 +41,9 @@ function App() {
     nextCycle,
     handleReset,
     setPinnedRegisters,
-    setRegisterFile,
+
+    instructionQueue,
+
     cache,
   } = useFunctions({
     setFloatAddSubStations,
@@ -57,6 +53,9 @@ function App() {
     setLoadStations,
     setStoreStations,
   });
+
+  console.log(cache);
+  console.log(instructionQueue);
 
   return (
     <div className="p-6 max-w-full mx-auto">

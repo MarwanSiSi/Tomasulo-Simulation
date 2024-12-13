@@ -23,7 +23,7 @@ export const useFunctions = ({
           ...acc,
           [`R${idx}`]: { value: 0, busy: false, station: null },
         }),
-        {},
+        {}
       ),
     ...Array(32)
       .fill()
@@ -32,7 +32,7 @@ export const useFunctions = ({
           ...acc,
           [`F${idx}`]: { value: 0, busy: false, station: null },
         }),
-        {},
+        {}
       ),
   });
   const [pinnedRegisters, setPinnedRegisters] = useState(new Set());
@@ -84,7 +84,7 @@ export const useFunctions = ({
       } catch (error) {
         console.error("Error parsing register file:", error);
         alert(
-          "Invalid register file format. Expected format: R0=1,R1=2,F0=3.14,F1=2.5",
+          "Invalid register file format. Expected format: R0=1,R1=2,F0=3.14,F1=2.5"
         );
       }
     };
@@ -96,8 +96,9 @@ export const useFunctions = ({
 
     const { data } = res;
 
-    const { cache, cycle, instruction_queue, registers, stations } = data;
+    const { cache, instruction_queue, registers, stations } = data;
 
+    console.log(instruction_queue);
     setInstructionQueue(instruction_queue);
 
     setRegisterFile(registers);
@@ -112,8 +113,9 @@ export const useFunctions = ({
 
     setStoreStations(stations.S);
 
-    setCycle(cycle);
+    setCycle((prev) => prev + 1);
 
+    console.log(cache);
     setCache(cache);
   };
 
@@ -131,7 +133,7 @@ export const useFunctions = ({
             ...acc,
             [`R${idx}`]: { value: 0, busy: false, station: null },
           }),
-          {},
+          {}
         ),
       ...Array(32)
         .fill()
@@ -140,7 +142,7 @@ export const useFunctions = ({
             ...acc,
             [`F${idx}`]: { value: 0, busy: false, station: null },
           }),
-          {},
+          {}
         ),
     });
   };
