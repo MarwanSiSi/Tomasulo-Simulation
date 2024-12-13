@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 
+from src.classes.Simulator import Simulator
 from src.utils import execute_station_entry
 
-from ..CDB import CDB
 from .StationEntry import StationEntry
 
 
@@ -14,7 +14,7 @@ class Station(ABC):
         self.entries: list[StationEntry] = [
             StationEntry(f"{prefex}{i + 1}", 0) for i in range(size)
         ]
-        self.cdb = CDB.get_instance()
+        self.simulator = Simulator.get_instance()
 
     def __str__(self):
         return f"{self.name} (Size: {self.size})"
@@ -63,7 +63,7 @@ class AddStation(Station):
 
     def update(self, time: int):
         """Simulates the execution of addition and subtraction instructions over user-defined cycles."""
-        tag, value, valid = self.cdb.read()
+        tag, value, valid = self.simulator.cdb.read()
 
         for index, entry in enumerate(self.entries):
             if not entry.busy:
@@ -103,7 +103,7 @@ class MulStation(Station):
 
     def update(self, time: int):
         """Simulates the execution of multiplication and division instructions over user-defined cycles."""
-        tag, value, valid = self.cdb.read()
+        tag, value, valid = self.simulator.cdb.read()
 
         for index, entry in enumerate(self.entries):
             if not entry.busy:
@@ -145,7 +145,7 @@ class LoadStation(Station):
 
     def update(self, time: int):
         """Simulates the execution of load instructions over user-defined cycles."""
-        tag, value, valid = self.cdb.read()
+        tag, value, valid = self.simulator.cdb.read()
 
         for index, entry in enumerate(self.entries):
             if not entry.busy:
@@ -156,7 +156,7 @@ class LoadStation(Station):
                     continue
 
                 if entry.qj == tag:
-                    entry.vj = value
+                    entry.a = value
                     entry.qj = None
 
                 continue
@@ -182,7 +182,7 @@ class StoreStation(Station):
 
     def update(self, time: int):
         """Simulates the execution of store instructions over user-defined cycles."""
-        tag, value, valid = self.cdb.read()
+        tag, value, valid = self.simulator.cdb.read()
 
         for index, entry in enumerate(self.entries):
             if not entry.busy:
@@ -193,7 +193,7 @@ class StoreStation(Station):
                     continue
 
                 if entry.qj == tag:
-                    entry.vj = value
+                    entry.a = value
                     entry.qj = None
 
                 continue

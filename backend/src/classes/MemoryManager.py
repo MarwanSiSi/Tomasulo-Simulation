@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 
-from .Cache import Cache
-from .CDB import CDB
 from src.exceptions import MemoryAccessException
+
+from .Cache import Cache
+from .Simulator import Simulator
 
 
 class MemoryManager:
@@ -23,7 +24,7 @@ class MemoryManager:
         self.data_memory: dict[int, int | float] = {}
         self.instruction_memory: dict[int, int | float] = {}
         self.requests: list[MemoryManager.Request] = []
-        self.cdb = CDB.get_instance()
+        self.simulatior = Simulator.get_instance()
 
     def update(self):
         for request in self.requests[:]:

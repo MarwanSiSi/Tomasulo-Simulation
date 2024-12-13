@@ -1,6 +1,7 @@
 from src.enums import Registers
+
 from .Register import Register
-from .CDB import CDB
+from .Simulator import Simulator
 
 
 class RegisterFile:
@@ -14,7 +15,7 @@ class RegisterFile:
         self.registers: dict[str, Register] = {
             e.value: Register(name=e) for e in Registers
         }
-        self.cdb = CDB.get_instance()
+        self.simulator = Simulator.get_instance()
 
     def get_register(self, name: Registers) -> int | float | str:
         """
@@ -49,7 +50,7 @@ class RegisterFile:
         Update all registers in the register file.
         """
         for register in self.registers.values():
-            tag, value, valid = self.cdb.read()
+            tag, value, valid = self.simulator.cdb.read()
             if not valid:
                 continue
 
