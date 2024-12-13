@@ -15,5 +15,8 @@ class MemoryManager:
         for tag, (stime, ctime) in self.requests.items():
             self.requests[tag] = (stime, ctime + 1)
 
-    def requestUpdate(self, tag: str, address: int, ctime: int):
-        self.requests[tag] = (0, 0)
+    def requestWrite(self, address: int, ctime: int):
+        pass
+
+    def requestRead(self, tag: str, address: int, ctime: int):
+        pass
