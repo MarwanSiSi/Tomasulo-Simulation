@@ -1,5 +1,5 @@
 from src.enums import Opcode
-from src.classes.StationEntry import StationEntry
+from src.classes.Station.StationEntry import StationEntry
 from src.utils.helpers import execute_station_entry
 
 

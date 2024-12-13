@@ -4,6 +4,7 @@ from src.utils import execute_station_entry
 
 from ..CDB import CDB
 from .StationEntry import StationEntry
+from src.enums.StationState import StationState
 
 
 class Station(ABC):
@@ -27,7 +28,7 @@ class Station(ABC):
         """Updates the station logic, including checking readiness and executing entries."""
         pass
 
-    def assign_entry(self, entry: StationEntry) -> bool:
+    def assign_entry(self, entry: StationEntry, time: int) -> bool:
         """
         Assigns a new entry to the station if a slot is available.
         Returns True if the entry is successfully assigned; False otherwise.
@@ -44,6 +45,8 @@ class Station(ABC):
             station_entry.qk = entry.qk
             station_entry.a = entry.a
             station_entry.cycles_remaining = self.latency
+            station_entry.state = StationState.WAITING
+            station_entry.start_cycle = time
             print(f"{self.name}: Assigned entry {entry}")
             return True
 
@@ -84,6 +87,7 @@ class AddStation(Station):
 
             if entry.cycles_remaining > 0:  # Decrement cycles
                 entry.cycles_remaining -= 1
+                entry.state = StationState.EXECUTING
                 print(
                     f"{self.name}: ADD/SUB in progress at slot {index}, "
                     f"cycles remaining = {entry.cycles_remaining}."
@@ -91,6 +95,8 @@ class AddStation(Station):
             else:  # Execute if all cycles are completed
                 try:
                     result = execute_station_entry(entry)
+                    entry.result = result
+                    entry.state = StationState.WRITING
                     print(
                         f"{self.name}: Executed ADD/SUB at slot {index}, result = {result}."
                     )
@@ -124,6 +130,7 @@ class MulStation(Station):
 
             if entry.cycles_remaining > 0:  # Decrement cycles
                 entry.cycles_remaining -= 1
+                entry.state = StationState.EXECUTING
                 print(
                     f"{self.name}: MUL/DIV in progress at slot {index}, "
                     f"cycles remaining = {entry.cycles_remaining}."
@@ -131,6 +138,8 @@ class MulStation(Station):
             else:  # Execute if all cycles are completed
                 try:
                     result = execute_station_entry(entry)
+                    entry.result = result
+                    entry.state = StationState.WRITING
                     print(
                         f"{self.name}: Executed MUL/DIV at slot {index}, result = {result}."
                     )
@@ -163,6 +172,7 @@ class LoadStation(Station):
 
             if entry.cycles_remaining > 0:  # Decrement cycles
                 entry.cycles_remaining -= 1
+                entry.state = StationState.EXECUTING
                 print(
                     f"{self.name}: LOAD in progress at slot {index}, "
                     f"cycles remaining = {entry.cycles_remaining}."
@@ -170,6 +180,8 @@ class LoadStation(Station):
             else:  # Execute if all cycles are completed
                 try:
                     result = entry.a
+                    entry.result = result
+                    entry.state = StationState.WRITING
                     print(
                         f"{self.name}: Executed LOAD at slot {index}, value = {result}."
                     )
@@ -200,6 +212,7 @@ class StoreStation(Station):
 
             if entry.cycles_remaining > 0:  # Decrement cycles
                 entry.cycles_remaining -= 1
+                entry.state = StationState.EXECUTING
                 print(
                     f"{self.name}: STORE in progress at slot {index}, "
                     f"cycles remaining = {entry.cycles_remaining}."
@@ -207,6 +220,7 @@ class StoreStation(Station):
             else:  # Execute if all cycles are completed
                 try:
                     # Perform store operation; for now, we assume it succeeds
+                    entry.state = StationState.WRITING
                     print(
                         f"{self.name}: Executed STORE at slot {index}, value = {entry.a}."
                     )
