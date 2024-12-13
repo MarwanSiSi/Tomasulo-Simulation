@@ -1,7 +1,7 @@
 from src.enums import Opcode
 
 
-class StationEntery:
+class StationEntry:
     def __init__(self) -> None:
         self.busy: bool = False
         self.op: Opcode
