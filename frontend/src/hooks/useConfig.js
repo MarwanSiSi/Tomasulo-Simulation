@@ -2,12 +2,27 @@ import { useState } from "react";
 
 export function useConfig() {
   const [config, setConfig] = useState({
-    addLatency: 2,
-    subLatency: 2,
-    mulLatency: 10,
-    divLatency: 40,
-    loadLatency: 2,
-    storeLatency: 2,
+    // Latencies
+    floatAddSubLatency: 1,
+    floatMulDivLatency: 1,
+    intAddSubLatency: 1,
+    intMulDivLatency: 1,
+
+    // Load/store latencies
+    cacheHitLatency: 1,
+    cacheMissLatency: 1,
+
+    // Station sizes
+    floatAddSubStationSize: 1,
+    floatMulDivStationSize: 1,
+
+    loadBufferSize: 1,
+    storeBufferSize: 1,
+
+    intAddSubStationSize: 1,
+    intMulDivStationSize: 1,
+
+    // Cache
     cacheSize: 1024,
     blockSize: 16,
   });
