@@ -1,4 +1,5 @@
 import PropTypes from "prop-types";
+import axios from "axios";
 
 const ConfigPanel = ({ config, setConfig }) => {
   const handleChange = (e) => {
@@ -7,6 +8,17 @@ const ConfigPanel = ({ config, setConfig }) => {
       ...prev,
       [name]: parseInt(value),
     }));
+  };
+
+  const handleSubmit = async () => {
+    axios
+      .post("http://0.0.0.0:8080/config", config)
+      .then((response) => {
+        console.log("Config posted successfully:", response.data);
+      })
+      .catch((error) => {
+        console.error("Error posting config:", error);
+      });
   };
 
   return (
@@ -194,6 +206,12 @@ const ConfigPanel = ({ config, setConfig }) => {
                 className="w-full p-2 border rounded"
               />
             </div>
+            <button
+              onClick={handleSubmit}
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+            >
+              Submit Configuration
+            </button>
           </div>
         </div>
       </div>
