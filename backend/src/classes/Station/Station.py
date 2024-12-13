@@ -156,7 +156,7 @@ class LoadStation(Station):
         """Simulates the execution of load instructions over user-defined cycles."""
         tag, value, valid = self.simulator.cdb.read()
 
-        for index, entry in enumerate(self.entries):
+        for entry in self.entries:
             if not entry.busy:
                 continue
 
@@ -186,7 +186,7 @@ class StoreStation(Station):
         """Simulates the execution of store instructions over user-defined cycles."""
         tag, value, valid = self.simulator.cdb.read()
 
-        for index, entry in enumerate(self.entries):
+        for entry in self.entries:
             if not entry.busy:
                 continue
 

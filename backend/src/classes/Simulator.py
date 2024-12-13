@@ -53,24 +53,19 @@ class Simulator:
         if len(self.instruction_queue) == 0:
             return
 
-        instruction = self.instruction_queue.popleft()
+        instruction = self.instruction_queue[0]
         raise NotImplementedError
 
     def write_back(self) -> None:
-        finished: list[CDB.CDBProtocol] = []
+        finished: list[StationEntry] = []
 
-        for station in self.reservation_stations:
+        for station in self.reservation_stations[:-1]:
             for entry in station.entries:
                 if entry.busy and entry.state == StationState.WRITING:
                     finished.append(entry)
 
-        for reqeust in self.memory_manager.requests.values():
-            if reqeust.result is not None:
-                finished.append(reqeust)  # type: ignore
-
         finished.sort(key=lambda x: x.start_cycle)
 
         self.cdb.write(finished[0].tag, finished[0].result)
-        if isinstance(finished[0], StationEntry):
-            finished[0].busy = False
-            finished[0].state = StationState.READY
+        finished[0].busy = False
+        finished[0].state = StationState.READY
