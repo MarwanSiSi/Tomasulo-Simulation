@@ -7,15 +7,10 @@ import { useStations } from "./hooks/useStations";
 import { useConfig } from "./hooks/useConfig";
 import { useFunctions } from "./hooks/useFunctions";
 import InstructionQueue from "./components/InstQueue";
-import ExecTable from "./components/ExecTable";
-import { useEffect, useState } from "react";
 import axios from "axios";
 
 function App() {
   const { config, setConfig } = useConfig();
-
-  const [cache, setCache] = useState([]);
-  const [instructionQueue, setInstructionQueue] = useState([]);
 
   const {
     floatAddSubStations,
@@ -44,16 +39,47 @@ function App() {
     pinnedRegisters,
     handleFileUpload,
     handleRegFileUpload,
-    nextCycle,
     handleReset,
     setPinnedRegisters,
+
+    instructionQueue,
+    setInstructionQueue,
     setRegisterFile,
-  } = useFunctions();
 
-  console.log(intAddSubStations);
+    cache,
+    setCache,
+    setCycle,
+  } = useFunctions({});
 
-  // things to be sent on mount : addSubLatency, mulDivLatency, intAddSubLatency, loadBufferSize, storeBufferSize, floatAddSubStationSize, floatMulDivStationSize, intAddSubStationSize, cacheHitLatency, cacheMissLatency, cacheSize, blockSize
-  useEffect(() => {}, []);
+  console.log(cache);
+  console.log(instructionQueue);
+
+  const nextCycle = async () => {
+    const res = await axios.get(`http://localhost:8080/cycle`);
+
+    const { data } = res;
+
+    const { cache, instruction_queue, registers, stations } = data;
+
+    console.log(instruction_queue);
+    setInstructionQueue(instructionQueue);
+
+    setRegisterFile(registers);
+
+    setFloatAddSubStations(stations.AF);
+
+    setFloatMulDivStations(stations.M);
+
+    setIntAddSubStations(stations.AI);
+
+    setLoadStations(stations.L);
+
+    setStoreStations(stations.S);
+
+    setCycle((prev) => prev + 1);
+
+    setCache(cache);
+  };
 
   return (
     <div className="p-6 max-w-full mx-auto">
@@ -140,64 +166,6 @@ function App() {
         </div>
       </div>
       <div className="mt-8 w-full flex justify-between gap-7">
-        <ExecTable
-          data={[
-            {
-              OP: "ADD",
-              Dest: "R2",
-              j: "R3",
-              k: "R4",
-              issue: 5,
-              execComp: 6,
-              writeResult: 7,
-            },
-            {
-              OP: "LD",
-              Dest: "F0",
-              j: null,
-              k: "R1",
-              issue: 5,
-              execComp: 6,
-              writeResult: 7,
-            },
-            {
-              OP: "SD",
-              Dest: null,
-              j: "F0",
-              k: "R1",
-              issue: 5,
-              execComp: 6,
-              writeResult: 7,
-            },
-            {
-              OP: "SD",
-              Dest: null,
-              j: "F0",
-              k: "R1",
-              issue: 5,
-              execComp: 6,
-              writeResult: 7,
-            },
-            {
-              OP: "SD",
-              Dest: null,
-              j: "F0",
-              k: "R1",
-              issue: 5,
-              execComp: 6,
-              writeResult: 7,
-            },
-            {
-              OP: "SD",
-              Dest: null,
-              j: "F0",
-              k: "R1",
-              issue: 5,
-              execComp: 6,
-              writeResult: 7,
-            },
-          ]}
-        />
         <div className="justify-end flex">
           <InstructionQueue instructions={instructionQueue} />
         </div>

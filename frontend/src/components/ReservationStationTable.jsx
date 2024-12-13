@@ -67,14 +67,12 @@ const ReservationStationTable = ({
                 <td className="border p-2 text-center">
                   {station.busy ? "1" : "0"}
                 </td>
-                <td className="border p-2 text-center">{station.op || "-"}</td>
-                <td className="border p-2 text-center">{station.vj || "-"}</td>
-                <td className="border p-2 text-center">{station.vk || "-"}</td>
-                <td className="border p-2 text-center">{station.qj || "-"}</td>
-                <td className="border p-2 text-center">{station.qk || "-"}</td>
-                <td className="border p-2 text-center">
-                  {station.address || "-"}
-                </td>
+                <td className="border p-2 text-center">{station.op ?? "-"}</td>
+                <td className="border p-2 text-center">{station.vj ?? "-"}</td>
+                <td className="border p-2 text-center">{station.vk ?? "-"}</td>
+                <td className="border p-2 text-center">{station.qj ?? "-"}</td>
+                <td className="border p-2 text-center">{station.qk ?? "-"}</td>
+                <td className="border p-2 text-center">{station.a ?? "-"}</td>
               </tr>
             ))}
           </tbody>

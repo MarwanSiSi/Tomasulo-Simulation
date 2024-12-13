@@ -1,10 +1,11 @@
 import { useState } from "react";
-import axios from "axios";
 
 export const useFunctions = () => {
   const [instructions, setInstructions] = useState([]);
   const [hasLoop, setHasLoop] = useState(false);
   const [cycle, setCycle] = useState(0);
+  const [instructionQueue, setInstructionQueue] = useState([]);
+  const [cache, setCache] = useState([]);
 
   const [registerFile, setRegisterFile] = useState({
     ...Array(32)
@@ -84,10 +85,6 @@ export const useFunctions = () => {
     reader.readAsText(file);
   };
 
-  const nextCycle = () => {
-    setCycle((prev) => prev + 1);
-  };
-
   const handleReset = (resetAllStations) => {
     setCycle(1);
     setHasLoop(false);
@@ -124,9 +121,13 @@ export const useFunctions = () => {
     pinnedRegisters,
     handleFileUpload,
     handleRegFileUpload,
-    nextCycle,
     handleReset,
     setPinnedRegisters,
     setRegisterFile,
+    instructionQueue,
+    setInstructionQueue,
+    cache,
+    setCache,
+    setCycle,
   };
 };
