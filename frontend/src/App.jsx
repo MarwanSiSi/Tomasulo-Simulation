@@ -7,9 +7,6 @@ import { useStations } from "./hooks/useStations";
 import { useConfig } from "./hooks/useConfig";
 import { useFunctions } from "./hooks/useFunctions";
 import InstructionQueue from "./components/InstQueue";
-import ExecTable from "./components/ExecTable";
-import { useEffect, useState } from "react";
-import axios from "axios";
 
 function App() {
   const { config, setConfig } = useConfig();
@@ -30,9 +27,6 @@ function App() {
     setLoadStations,
     setStoreStations,
 
-    instructionQueue,
-    setInstructionQueue,
-
     resetAllStations,
   } = useStations(config);
 
@@ -47,7 +41,9 @@ function App() {
     nextCycle,
     handleReset,
     setPinnedRegisters,
-    setRegisterFile,
+
+    instructionQueue,
+
     cache,
   } = useFunctions({
     setFloatAddSubStations,
@@ -58,17 +54,8 @@ function App() {
     setStoreStations,
   });
 
-  // things to be sent on mount : addSubLatency, mulDivLatency, intAddSubLatency, loadBufferSize, storeBufferSize, floatAddSubStationSize, floatMulDivStationSize, intAddSubStationSize, cacheHitLatency, cacheMissLatency, cacheSize, blockSize
-  useEffect(() => {
-    axios
-      .post("http://0.0.0.0:8080/config", config)
-      .then((response) => {
-        console.log("Config posted successfully:", response.data);
-      })
-      .catch((error) => {
-        console.error("Error posting config:", error);
-      });
-  }, []);
+  console.log(cache);
+  console.log(instructionQueue);
 
   return (
     <div className="p-6 max-w-full mx-auto">

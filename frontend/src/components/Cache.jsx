@@ -43,12 +43,7 @@ const Cache = ({ data = [] }) => {
   );
 };
 Cache.propTypes = {
-  data: PropTypes.arrayOf(
-    PropTypes.shape({
-      address: PropTypes.string.isRequired,
-      value: PropTypes.string.isRequired,
-    })
-  ),
+  data: PropTypes.array,
 };
 
 export default Cache;
