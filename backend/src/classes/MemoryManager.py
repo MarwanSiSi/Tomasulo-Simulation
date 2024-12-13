@@ -10,11 +10,11 @@ class MemoryManager:
     @dataclass
     class Request:
         tag: str
-        stime: int
-        ctime: int
-        etime: int
+        start_cycle: int
+        current_cycle: int
+        end_cycle: int
         address: int
-        value: int | float | None
+        value: int | float | None = None
         result: int | float | None = None
         done: bool = False
 
@@ -30,12 +30,12 @@ class MemoryManager:
 
     def update(self):
         for tag, request in self.requests.copy().items():
-            stime = request.stime
-            ctime = request.ctime
-            etime = request.etime
+            stime = request.start_cycle
+            ctime = request.current_cycle
+            etime = request.end_cycle
             address = request.address
             value = request.value
-            request.ctime += 1
+            request.current_cycle += 1
 
             if (ctime - stime) != etime:
                 continue
@@ -48,13 +48,13 @@ class MemoryManager:
                     request.result = self.cache.read(address)
                     request.done = True
                 except MemoryAccessException:
-                    request.etime += self.penalty
+                    request.end_cycle += self.penalty
             elif tag.upper().startswith("S"):
                 try:
                     self.cache.write(address, value or 0)
                     request.done = True
                 except MemoryAccessException:
-                    request.etime += self.penalty
+                    request.end_cycle += self.penalty
             else:
                 raise ValueError(f"Invalid tag: {tag}")
 
@@ -71,7 +71,11 @@ class MemoryManager:
         etime = self.latency
 
         self.requests[tag] = MemoryManager.Request(
-            tag, stime, ctime, etime, address, None
+            tag,
+            stime,
+            ctime,
+            etime,
+            address,
         )
 
     def transfer_to_cache(self, address: int):
