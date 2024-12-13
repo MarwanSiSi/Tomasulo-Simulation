@@ -1,4 +1,4 @@
-from src.enums import Registers, Opcode, InstructionType
+from src.enums import InstructionType, Opcode, Registers
 
 
 class Instruction:
