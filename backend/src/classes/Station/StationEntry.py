@@ -3,7 +3,7 @@ from src.enums import Opcode, StationState
 
 class StationEntry:
     def __init__(self, tag: str, cycles_required: int) -> None:
-        self.tag: str = tag
+        self.tag: str = tag | None
         self.state: StationState = StationState.READY
         self.busy = False
         self.op: Opcode | None = None
@@ -14,7 +14,7 @@ class StationEntry:
         self.a: int = 0
         self.result: int | float = 0
         self.start_cycle: int = 0
-        self.cycles_remaining: int = cycles_required
+        self.cycles_remaining: int = cycles_required | None
 
     def reset(self) -> None:
         self.busy = False
