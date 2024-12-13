@@ -1,7 +1,9 @@
 import { useState } from "react";
-
 export function useConfig() {
   const [config, setConfig] = useState({
+    //file path
+    filePath: "C/:Users/Legion/Desktop/MicroProj/instructions.txt",
+
     // Latencies
     floatAddSubLatency: 1,
     floatMulDivLatency: 1,

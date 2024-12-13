@@ -8,11 +8,14 @@ import { useConfig } from "./hooks/useConfig";
 import { useFunctions } from "./hooks/useFunctions";
 import InstructionQueue from "./components/InstQueue";
 import ExecTable from "./components/ExecTable";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 function App() {
   const { config, setConfig } = useConfig();
+
+  const [cache, setCache] = useState([]);
+  const [instructionQueue, setInstructionQueue] = useState([]);
 
   const {
     floatAddSubStations,
@@ -22,6 +25,13 @@ function App() {
     storeStations,
 
     intAddSubStations,
+
+    setFloatAddSubStations,
+    setFloatMulDivStations,
+    setIntAddSubStations,
+
+    setLoadStations,
+    setStoreStations,
 
     resetAllStations,
   } = useStations(config);
@@ -37,7 +47,10 @@ function App() {
     nextCycle,
     handleReset,
     setPinnedRegisters,
+    setRegisterFile,
   } = useFunctions();
+
+  console.log(intAddSubStations);
 
   // things to be sent on mount : addSubLatency, mulDivLatency, intAddSubLatency, loadBufferSize, storeBufferSize, floatAddSubStationSize, floatMulDivStationSize, intAddSubStationSize, cacheHitLatency, cacheMissLatency, cacheSize, blockSize
   useEffect(() => {}, []);
@@ -120,7 +133,7 @@ function App() {
                 />
               </div>
               <div className="mt-10">
-                <Cache />
+                <Cache data={cache} />
               </div>
             </div>
           </div>
@@ -186,22 +199,7 @@ function App() {
           ]}
         />
         <div className="justify-end flex">
-          <InstructionQueue
-            instructions={[
-              "DADDI R1, R1, 24",
-              "DADDI R2, R2, 0",
-              "DADDI R1, R1, 24",
-              "DADDI R2, R2, 0",
-              "DADDI R1, R1, 24",
-              "DADDI R2, R2, 0",
-              "DADDI R1, R1, 24",
-              "DADDI R2, R2, 0",
-              "DADDI R1, R1, 24",
-              "DADDI R2, R2, 0",
-              "DADDI R1, R1, 24",
-              "DADDI R2, R2, 0",
-            ]}
-          />
+          <InstructionQueue instructions={instructionQueue} />
         </div>
       </div>
     </div>

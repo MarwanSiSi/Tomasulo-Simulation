@@ -1,8 +1,6 @@
-import React from "react";
+import PropTypes from "prop-types";
 
-const Cache = ({ data }) => {
-  const entries = data ? Object.entries(data) : [];
-
+const Cache = ({ data = [] }) => {
   return (
     <>
       <h2 className="text-xl font-bold">Cache Contents</h2>
@@ -16,14 +14,14 @@ const Cache = ({ data }) => {
               </tr>
             </thead>
             <tbody>
-              {entries.length > 0 ? (
-                entries.map(([key, value]) => (
-                  <tr key={key} className="hover:bg-gray-50">
+              {data.length > 0 ? (
+                data.map((entry, index) => (
+                  <tr key={index} className="hover:bg-gray-50">
                     <td className="px-4 py-2 border-b font-mono text-center">
-                      {key}
+                      {entry.address}
                     </td>
                     <td className="px-4 py-2 border-b font-mono text-center">
-                      {String(value)}
+                      {entry.value}
                     </td>
                   </tr>
                 ))
@@ -43,6 +41,14 @@ const Cache = ({ data }) => {
       </div>
     </>
   );
+};
+Cache.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      address: PropTypes.string.isRequired,
+      value: PropTypes.string.isRequired,
+    })
+  ),
 };
 
 export default Cache;
