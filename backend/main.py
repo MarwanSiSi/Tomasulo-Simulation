@@ -1,6 +1,6 @@
 from src.enums import Opcode
 from src.classes.StationEntry import StationEntry
-from src.Execution.Exectution import execute_station_entry
+from src.utils.helpers import execute_station_entry
 
 
 if __name__ == "__main__":
@@ -12,4 +12,3 @@ if __name__ == "__main__":
     result = execute_station_entry(entry)
     if result is not None:
         print(f"Execution result: {result}")
-
