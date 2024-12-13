@@ -1,5 +1,6 @@
 from src.enums import Registers
 from .Register import Register
+from .CDB import CDB
 
 
 class RegisterFile:
@@ -13,6 +14,7 @@ class RegisterFile:
         self.registers: dict[str, Register] = {
             e.value: Register(name=e) for e in Registers
         }
+        self.cdb = CDB.get_instance()
 
     def get_register(self, name: Registers) -> int | float | str:
         """
@@ -41,3 +43,15 @@ class RegisterFile:
                 self.registers[name.value].update(value_or_tag)
         else:
             raise Exception("Register not found")
+
+    def update(self) -> None:
+        """
+        Update all registers in the register file.
+        """
+        for register in self.registers.values():
+            tag, value, valid = self.cdb.read()
+            if not valid:
+                continue
+
+            if register.get() == tag:
+                register.update(value)
