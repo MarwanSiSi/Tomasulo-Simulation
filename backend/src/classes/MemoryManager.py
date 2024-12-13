@@ -10,11 +10,13 @@ class MemoryManager:
     @dataclass
     class Request:
         tag: str
-        stime: int
-        ctime: int
-        etime: int
+        start_cycle: int
+        current_cycle: int
+        end_cycle: int
         address: int
-        value: int | float | None
+        value: int | float | None = None
+        result: int | float | None = None
+        done: bool = False
 
     def __init__(self, latency: int = 1, penalty: int = 5, block_size: int = 1024):
         self.latency = latency
@@ -22,19 +24,17 @@ class MemoryManager:
         self.block_size = block_size
         self.cache = Cache()
         self.data_memory: dict[int, int | float] = {}
-        self.instruction_memory: dict[int, int | float] = {}
-        self.requests: list[MemoryManager.Request] = []
+        self.requests: dict[str, MemoryManager.Request] = {}
         self.simulatior = Simulator.get_instance()
 
     def update(self):
-        for request in self.requests[:]:
-            tag = request.tag
-            stime = request.stime
-            ctime = request.ctime
-            etime = request.etime
+        for tag, request in self.requests.copy().items():
+            stime = request.start_cycle
+            ctime = request.current_cycle
+            etime = request.end_cycle
             address = request.address
             value = request.value
-            request.ctime += 1
+            request.current_cycle += 1
 
             if (ctime - stime) != etime:
                 continue
@@ -44,15 +44,16 @@ class MemoryManager:
 
             if tag.upper().startswith("L"):
                 try:
-                    request.value = self.cache.read(address)
+                    request.result = self.cache.read(address)
+                    request.done = True
                 except MemoryAccessException:
-                    request.etime += self.penalty
+                    request.end_cycle += self.penalty
             elif tag.upper().startswith("S"):
                 try:
                     self.cache.write(address, value or 0)
-                    self.requests.remove(request)
+                    request.done = True
                 except MemoryAccessException:
-                    request.etime += self.penalty
+                    request.end_cycle += self.penalty
             else:
                 raise ValueError(f"Invalid tag: {tag}")
 
@@ -60,16 +61,20 @@ class MemoryManager:
         stime = ctime
         etime = self.latency
 
-        self.requests.append(
-            MemoryManager.Request(tag, stime, ctime, etime, address, value)
+        self.requests[tag] = MemoryManager.Request(
+            tag, stime, ctime, etime, address, value
         )
 
     def request_load(self, tag: str, address: int, ctime: int):
         stime = ctime
         etime = self.latency
 
-        self.requests.append(
-            MemoryManager.Request(tag, stime, ctime, etime, address, None)
+        self.requests[tag] = MemoryManager.Request(
+            tag,
+            stime,
+            ctime,
+            etime,
+            address,
         )
 
     def transfer_to_cache(self, address: int):

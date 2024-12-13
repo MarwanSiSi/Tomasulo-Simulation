@@ -1,7 +1,13 @@
+from typing import Protocol
 from src.exceptions import CDBException
 
 
 class CDB:
+    class CDBProtocol(Protocol):
+        tag: str
+        start_cycle: int
+        result: int | float
+
     def __init__(self) -> None:
         self.__tag: str = ""
         self.__data: int | float = 0

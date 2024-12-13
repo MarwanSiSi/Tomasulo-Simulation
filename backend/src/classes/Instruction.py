@@ -11,7 +11,7 @@ class Instruction:
         target: Registers | None = None,
         dest: Registers | None = None,
     ):
-        self.type = instr_type  # R-type, I-type, or J-type
+        self.instr_type = instr_type  # R-type, I-type, or J-type
         self.opcode = opcode  # Opcode from the Opcode enum
         self.immediate = immediate  # Memory immediate (for load/store or label)
         self.src = src  # Source register (Registers enum)
@@ -20,7 +20,7 @@ class Instruction:
 
     def __repr__(self):
         return (
-            f"Instruction(type={self.type}, opcode={self.opcode}, "
+            f"Instruction(type={self.instr_type}, opcode={self.opcode}, "
             f"immediate={self.immediate}, src={self.src}, "
             f"target={self.target}, dest={self.dest})"
         )
@@ -136,10 +136,3 @@ class Instruction:
                 instructions.append(instruction)
 
         return instructions
-
-
-if __name__ == "__main__":
-    filepath = "instructions.txt"
-    instructions = Instruction.parse_instructions_file(filepath)
-    for instr in instructions:
-        print(instr)

@@ -11,11 +11,10 @@ class StationEntry:
         self.vk: int | float = 0
         self.qj: str | None = None
         self.qk: str | None = None
-        self.a: int | float = 0
+        self.a: int = 0
+        self.result: int | float = 0
         self.start_cycle: int = 0
         self.cycles_remaining: int = cycles_required
-        self.start_cycle: int =0
-        self.result: int | float = 0
 
     def reset(self) -> None:
         self.busy = False
@@ -26,6 +25,7 @@ class StationEntry:
         self.qj = None
         self.qk = None
         self.a = 0
+        self.result = 0
         self.start_cycle = 0
         self.cycles_remaining = 0
         self.start_cycle = 0
