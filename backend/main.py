@@ -1,34 +1,14 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
-
-app = FastAPI()
-
-
-class Item(BaseModel):
-    name: str
-    description: str | None = None
-    price: float
-    tax: float | None = None
+from src.enums import Opcode
+from src.classes.StationEntry import StationEntry
+from src.utils.helpers import execute_station_entry
 
 
-db: dict[int, Item] = {}
-
-
-@app.get("/items")
-async def read_items():
-    global db
-    return db
-
-
-@app.post("/items")
-async def create_item(item: Item):
-    global db
-    item_id = len(db) + 1
-    db[item_id] = item
-    return item
-
-
-@app.get("/items/{item_id}")
-async def read_item(item_id: int):
-    global db
-    return db[item_id]
+if __name__ == "__main__":
+    entry = StationEntry()
+    entry.busy = True
+    entry.op = Opcode.ADD_D
+    entry.vj = 5
+    entry.vk = 3
+    result = execute_station_entry(entry)
+    if result is not None:
+        print(f"Execution result: {result}")
