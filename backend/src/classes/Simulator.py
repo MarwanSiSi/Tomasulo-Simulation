@@ -1,13 +1,14 @@
 from collections import deque
 
 from .Station.StationEntry import StationEntry
-from src.enums import StationState, Opcode
+from src.enums import StationState, Opcode, Registers
 
 from .CDB import CDB
 from .Instruction import Instruction
 from .MemoryManager import MemoryManager
 from .RegisterFile import RegisterFile
 from .Station.Station import Station, AddStation, MulStation, LoadStation, StoreStation
+from src.classes import Instruction, Register, RegisterFile
 
 
 class Simulator:
@@ -61,11 +62,81 @@ class Simulator:
 
         self.write_back()
 
+    def instruction_to_station_entry(
+    self,
+    instruction: Instruction,
+) -> StationEntry:
+
+        station = StationEntry()
+        station.op = instruction.opcode
+
+        # Handle the source register (vj, qj)
+        src = self.register_file.get_register(instruction.src)
+        target = self.register_file.get_register(instruction.src)
+        if src:
+            if instruction.opcode in {
+            Opcode.ADD_D,
+            Opcode.SUB_D,
+            Opcode.MUL_D,
+            Opcode.DIV_D,
+            Opcode.ADD_S,
+            Opcode.SUB_S,
+            Opcode.MUL_S,
+            Opcode.DIV_S,
+            }:
+                if src.Q:
+                    station.qj = src.Q
+                else:
+                    station.vj = src.get()
+                # Handle the target register (vk, qk)
+                if target:
+                    if target.Q:
+                        station.qk = target.Q
+                    else:
+                        station.vk = target.get()
+
+            elif instruction.Opcode in {Opcode.DADDI, Opcode.DSUBI}:
+                if src.Q:
+                    station.qj = src.Q
+                else:
+                    station.vj = src.get()
+                station.a = instruction.immediate
+
+            elif instruction.Opcode in {
+            Opcode.L_D,
+            Opcode.L_S,
+            Opcode.LW,
+            Opcode.LD,
+            Opcode.S_D,
+            Opcode.S_S,
+            Opcode.SW,
+            Opcode.SD,
+            }:
+                if target:
+                    if target.Q:
+                        station.qk = target.Q
+                    else:
+                        station.vk = target.get()
+                if src:
+                    if src.q:
+                        station.qj = src.Q
+                    else:
+                        station.vj = src.get()
+                else:
+                    station.a = instruction.immediate
+
+        # Mark the reservation station as busy
+        station.busy = True
+
+        return station
+
+
+
     def issue(self) -> None:
         if len(self.instruction_queue) == 0:
             return
-
-        instruction = self.instruction_queue[0]
+        
+        instruction = self.instruction_to_station_entry(self.instruction_queue[0])
 
         if instruction.opcode in {Opcode.DADDI, Opcode.DSUBI}:
             result = self.reservation_stations[0].assign_entry(instruction, self.cycle)
