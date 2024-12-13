@@ -1,10 +1,20 @@
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from src.classes.Simulator import Simulator
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 simulator = Simulator()
 
 
@@ -46,6 +56,7 @@ class Register(BaseModel):
 
 
 class Cycle(BaseModel):
+    cycle: int
     stations: dict[str, dict[str, ReservationStation]]
     registers: dict[str, Register]
     instruction_queue: list[str]
@@ -75,6 +86,7 @@ async def set_config(config: Config):
 async def get_cycle() -> Cycle:
     simulator.update()
     return Cycle(
+        cycle=simulator.cycle,
         stations=await get_stations(),
         registers=await get_register_file(),
         instruction_queue=await get_instruction_queue(),
@@ -129,4 +141,4 @@ async def get_cache() -> dict[str, str]:
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", port=8080, host="0.0.0.0", reload=True)
+    uvicorn.run("main:app", port=8080, reload=True)
