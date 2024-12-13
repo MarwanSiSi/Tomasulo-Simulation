@@ -13,6 +13,11 @@ class Register:
         self.value = value
         self.Q = Q  # The reservation station tag can be a string or None.
 
+    def reset(self):
+        """Reset the register's value and reservation station tag."""
+        self.value = 0.0
+        self.Q = None
+
     def get(self) -> int | float | str:
         """Returns the value or reservation station tag (Q) of the register."""
         if self.name == Registers.R0:

@@ -15,6 +15,9 @@ class Cache:
     def __repr__(self) -> str:
         return self.__str__()
 
+    def reset(self):
+        self.cache.clear()
+
     def contains(self, address: int) -> bool:
         return address in self.cache
 
@@ -25,4 +28,7 @@ class Cache:
             raise MemoryAccessException(address) from e
 
     def write(self, address: int, value: int | float):
+        if address not in self.cache:
+            raise MemoryAccessException(address)
+
         self.cache[address] = value

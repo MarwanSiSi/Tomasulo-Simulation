@@ -94,6 +94,11 @@ async def get_cycle() -> Cycle:
     )
 
 
+@app.post("/reset")
+async def reset() -> None:
+    simulator.reset()
+
+
 @app.get("/stations")
 async def get_stations() -> dict[str, dict[str, ReservationStation]]:
     ret = {}

@@ -27,6 +27,13 @@ class RegisterFile:
     def __repr__(self) -> str:
         return self.__str__()
 
+    def reset(self) -> None:
+        """
+        Reset all registers in the register file.
+        """
+        for register in self.registers.values():
+            register.reset()
+
     def get_register(self, name: Registers) -> int | float | str:
         """
         Retrieve the value or reservation station tag of a register by its name.

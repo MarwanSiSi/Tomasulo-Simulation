@@ -28,6 +28,11 @@ class MemoryManager:
         self.requests: dict[str, MemoryManager.Request] = {}
         self.simulator = simulator
 
+    def reset(self):
+        self.cache.reset()
+        self.data_memory.clear()
+        self.requests.clear()
+
     def update(self):
         for tag, request in self.requests.copy().items():
             stime = request.start_cycle
@@ -86,4 +91,4 @@ class MemoryManager:
         end = start + self.block_size
 
         for i in range(start, end):
-            self.cache.write(i, self.data_memory.get(i, 0))
+            self.cache.cache[i] = self.data_memory.get(i, 0)

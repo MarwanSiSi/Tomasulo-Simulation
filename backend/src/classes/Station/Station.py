@@ -76,6 +76,10 @@ class AddStation(Station):
             if not entry.busy:
                 continue
 
+            if entry.state == StationState.ISSUED:
+                entry.state = StationState.WAITING
+                return
+
             if entry.qj is not None or entry.qk is not None:  # Check readiness
                 if not valid:
                     continue
@@ -88,10 +92,6 @@ class AddStation(Station):
                     entry.qk = None
 
                 continue
-
-            if entry.state == StationState.ISSUED:
-                entry.state = StationState.WAITING
-                return
 
             if entry.cycles_remaining > 0:  # Decrement cycles
                 entry.cycles_remaining -= 1
@@ -116,6 +116,10 @@ class MulStation(Station):
             if not entry.busy:
                 continue
 
+            if entry.state == StationState.ISSUED:
+                entry.state = StationState.WAITING
+                return
+
             if entry.qj is not None or entry.qk is not None:  # Check readiness
                 if not valid:
                     continue
@@ -128,10 +132,6 @@ class MulStation(Station):
                     entry.qk = None
 
                 continue
-
-            if entry.state == StationState.ISSUED:
-                entry.state = StationState.WAITING
-                return
 
             if entry.cycles_remaining > 0:  # Decrement cycles
                 entry.cycles_remaining -= 1
@@ -158,6 +158,10 @@ class LoadStation(Station):
             if not entry.busy:
                 continue
 
+            if entry.state == StationState.ISSUED:
+                entry.state = StationState.WAITING
+                return
+
             if entry.qj is not None:
                 if not valid:
                     continue
@@ -168,14 +172,11 @@ class LoadStation(Station):
 
                 continue
 
-            if entry.state == StationState.ISSUED:
-                entry.state = StationState.WAITING
-                return
-
             mem_request = self.simulator.memory_manager.requests.get(entry.tag, None)
-            if mem_request is not None and mem_request.result is not None:
+            if mem_request is not None and mem_request.done:
                 entry.result = mem_request.result
                 entry.state = StationState.WRITING
+                del self.simulator.memory_manager.requests[entry.tag]
             elif mem_request is None:
                 self.simulator.memory_manager.request_load(entry.tag, entry.a, time)
                 entry.state = StationState.EXECUTING
@@ -192,29 +193,31 @@ class StoreStation(Station):
             if not entry.busy:
                 continue
 
-            if entry.qj is None or entry.qk is not None:
-                if not valid:
-                    continue
-
-                if entry.qj == tag:
-                    entry.vj = int(value)
-                    entry.qj = None
-
-                if entry.qk == tag:
-                    entry.a = int(value)
-                    entry.qk = None
-
-                continue
-
             if entry.state == StationState.ISSUED:
                 entry.state = StationState.WAITING
                 return
 
+            if entry.qj is not None or entry.qk is not None:
+                if not valid:
+                    continue
+
+                if entry.qj == tag:
+                    entry.a = int(value)
+                    entry.qj = None
+
+                if entry.qk == tag:
+                    entry.vk = value
+                    entry.qk = None
+
+                continue
+
             mem_request = self.simulator.memory_manager.requests.get(entry.tag, None)
             if mem_request is not None and mem_request.done:
-                entry.state = StationState.WRITING
+                entry.busy = False
+                entry.state = StationState.READY
+                del self.simulator.memory_manager.requests[entry.tag]
             elif mem_request is None:
                 self.simulator.memory_manager.request_store(
-                    entry.tag, entry.a, entry.vj, time
+                    entry.tag, entry.a, entry.vk, time
                 )
                 entry.state = StationState.EXECUTING

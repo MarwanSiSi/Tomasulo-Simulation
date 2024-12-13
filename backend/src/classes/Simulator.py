@@ -18,11 +18,11 @@ class Simulator:
         self.memory_manager: MemoryManager = MemoryManager(self)
         self.register_file: RegisterFile = RegisterFile(self)
         self.reservation_stations: list[Station] = [
-            AddStation(self, "AI", 4, 1, "AI"),
-            AddStation(self, "AF", 4, 1, "AF"),
-            MulStation(self, "M", 4, 1, "MF"),
-            LoadStation(self, "L", 4, 1, "L"),
-            StoreStation(self, "S", 4, 1, "S"),
+            AddStation(self, "AI", 1, 1, "AI"),
+            AddStation(self, "AF", 1, 1, "AF"),
+            MulStation(self, "M", 1, 1, "MF"),
+            LoadStation(self, "L", 1, 1, "L"),
+            StoreStation(self, "S", 1, 1, "S"),
         ]
         self.cdb = CDB()
         self.instruction_queue: deque[Instruction] = deque()
@@ -33,10 +33,32 @@ class Simulator:
     def __repr__(self) -> str:
         return str(self)
 
+    def reset(self) -> None:
+        self.pc = -1
+        self.cycle = -1
+        self.program = []
+        self.memory_manager.reset()
+        self.register_file.reset()
+        self.reservation_stations = [
+            AddStation(self, "AI", 1, 1, "AI"),
+            AddStation(self, "AF", 1, 1, "AF"),
+            MulStation(self, "M", 1, 1, "MF"),
+            LoadStation(self, "L", 1, 1, "L"),
+            StoreStation(self, "S", 1, 1, "S"),
+        ]
+        self.cdb.reset()
+        self.instruction_queue.clear()
+
     def load_program(self, file_path: str) -> None:
         self.program = Instruction.parse_instructions_file(file_path)
 
     def update(self) -> None:
+        if self.pc == -1:
+            self.pc = 0
+            self.cycle = 0
+            self.instruction_queue.append(self.program[self.pc])
+            return
+
         self.cycle += 1
         self.pc += 1
 
@@ -128,7 +150,7 @@ class Simulator:
                 if isinstance(src, str):
                     station.qj = src
                 else:
-                    station.vj = src
+                    station.a = int(src)
             else:
                 assert instruction.immediate is not None
                 station.a = instruction.immediate
@@ -256,12 +278,18 @@ class Simulator:
                     register.Q = None
                     register.value = value
 
-        for staion in self.reservation_stations:
-            for entry in staion.entries:
+        for station in self.reservation_stations:
+            for entry in station.entries:
                 if entry.qj is not None:
                     tag, value, _ = self.cdb.read()
                     if tag == entry.qj:
                         entry.qj = None
+
+                    if isinstance(station, LoadStation) or isinstance(
+                        station, StoreStation
+                    ):
+                        entry.a = int(value)
+                    else:
                         entry.vj = value
 
                 if entry.qk is not None:
