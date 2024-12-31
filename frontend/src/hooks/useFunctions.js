@@ -32,6 +32,9 @@ export const useFunctions = () => {
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
+    axios.postForm("http://127.0.0.1:8080/upload", {
+      file,
+    });
     const reader = new FileReader();
     reader.onload = (e) => {
       const text = e.target.result;
@@ -49,6 +52,9 @@ export const useFunctions = () => {
       setInstructions(parsedInstructions);
     };
     reader.readAsText(file);
+
+    // remove file from input
+    event.target.value = "";
   };
 
   const handleRegFileUpload = (event) => {

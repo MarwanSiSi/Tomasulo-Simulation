@@ -57,8 +57,6 @@ function App() {
 
     const { data } = res;
 
-    console.log(data);
-
     const { cache, instruction_queue, registers, stations } = data;
 
     setInstructionQueue(instruction_queue);

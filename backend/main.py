@@ -1,5 +1,5 @@
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -19,8 +19,6 @@ simulator = Simulator()
 
 
 class Config(BaseModel):
-    filePath: str
-
     floatAddSubLatency: int
     floatMulDivLatency: int
     intAddSubLatency: int
@@ -65,7 +63,6 @@ class Cycle(BaseModel):
 
 @app.post("/config")
 async def set_config(config: Config):
-    simulator.load_program(config.filePath)
     simulator.reservation_stations[0].set_size(config.intAddSubStationSize)
     simulator.reservation_stations[1].set_size(config.floatAddSubStationSize)
     simulator.reservation_stations[2].set_size(config.floatMulDivStationSize)
@@ -80,6 +77,17 @@ async def set_config(config: Config):
     simulator.memory_manager.block_size = config.blockSize
     simulator.memory_manager.latency = config.cacheHitLatency
     simulator.memory_manager.penalty = config.cacheMissLatency
+
+
+@app.post("/upload")
+async def load_program(file: UploadFile = File(...)):
+    lines = []
+    for bLine in file.file.readlines():
+        line = bLine.decode("utf-8").strip()
+        if line:
+            lines.append(line)
+
+    simulator.load_program(lines)
 
 
 @app.get("/cycle")
@@ -101,7 +109,7 @@ async def reset() -> None:
 
 @app.get("/stations")
 async def get_stations() -> dict[str, dict[str, ReservationStation]]:
-    ret = {}
+    ret: dict[str, dict[str, ReservationStation]] = {}
     for station in simulator.reservation_stations:
         ret[station.name] = {}
         for entry in station.entries:

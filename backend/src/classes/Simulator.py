@@ -49,8 +49,8 @@ class Simulator:
         self.cdb.reset()
         self.instruction_queue.clear()
 
-    def load_program(self, file_path: str) -> None:
-        self.program = Instruction.parse_instructions_file(file_path)
+    def load_program(self, lines: list[str]) -> None:
+        self.program = Instruction.parse_instructions_file(lines)
 
     def update(self) -> None:
         if self.pc == -1:

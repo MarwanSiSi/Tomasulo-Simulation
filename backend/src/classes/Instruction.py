@@ -143,19 +143,16 @@ class Instruction:
             raise ValueError(f"Unhandled opcode: {opcode}")
 
     @staticmethod
-    def parse_instructions_file(filepath) -> list["Instruction"]:
+    def parse_instructions_file(lines: list[str]) -> list["Instruction"]:
         """
         Reads the instructions text file and parses it into a list of Instruction objects.
         Handles labels and assigns them line numbers.
         """
         instructions = []
         labels: dict[str, int] = {}
-        lines = []
-        with open(filepath, "r") as file:
-            lines = [line.strip() for line in file.readlines() if line.strip() != ""]
-            for idx, line in enumerate(lines):
-                line = line.strip()
-                instruction = Instruction.parse_instruction(line, labels, idx)
-                instructions.append(instruction)
+        for idx, line in enumerate(lines):
+            line = line.strip()
+            instruction = Instruction.parse_instruction(line, labels, idx)
+            instructions.append(instruction)
 
         return instructions

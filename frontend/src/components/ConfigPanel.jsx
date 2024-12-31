@@ -11,14 +11,7 @@ const ConfigPanel = ({ config, setConfig }) => {
   };
 
   const handleSubmit = async () => {
-    axios
-      .post("http://0.0.0.0:8080/config", config)
-      .then((response) => {
-        console.log("Config posted successfully:", response.data);
-      })
-      .catch((error) => {
-        console.error("Error posting config:", error);
-      });
+    axios.post("http://0.0.0.0:8080/config", config);
   };
 
   return (
